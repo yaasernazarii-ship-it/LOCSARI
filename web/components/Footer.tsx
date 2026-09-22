@@ -26,7 +26,6 @@ export default async function Footer() {
             src={logoUrl}
             alt=""
             style={{ cursor: "pointer" }}
-            code={enamad.code}
           />
         </a>
         <span className="site-footer__copyright">
