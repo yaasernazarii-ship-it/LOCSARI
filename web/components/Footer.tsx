@@ -22,9 +22,11 @@ export default async function Footer() {
           rel="noopener noreferrer"
         >
           <img
-            alt="نماد اعتماد الکترونیکی"
             referrerPolicy="origin"
             src={logoUrl}
+            alt=""
+            style={{ cursor: "pointer" }}
+            code={enamad.code}
           />
         </a>
         <span className="site-footer__copyright">
