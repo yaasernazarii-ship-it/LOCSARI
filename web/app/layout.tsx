@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -5,11 +6,24 @@ import Footer from "@/components/Footer";
 import PwaRegister from "@/components/PwaRegister";
 
 const SITE_URL = process.env.SITE_URL || "https://locationsari.ir";
+const DESCRIPTION = "لوکیشن ساری؛ مرجع تخصصی خرید، فروش، رهن و اجاره ملک در ساری با آگهی‌های معتبر، تصاویر کامل و اطلاعات دقیق املاک.";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+function getSiteUrl(host?: string): string {
+  return host === "locationsari.com" || host === "www.locationsari.com"
+    ? "https://locationsari.com"
+    : host === "locationsari.ir" || host === "www.locationsari.ir"
+      ? "https://locationsari.ir"
+      : SITE_URL;
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const host = (await headers()).get("host")?.toLowerCase().split(":")[0];
+  const siteUrl = getSiteUrl(host);
+
+  return {
+    metadataBase: new URL(siteUrl),
   title: { default: "لوکیشن ساری | خرید و فروش و اجاره ملک در ساری", template: "%s | لوکیشن ساری" },
-  description: "پلتفرم تخصصی املاک شهر ساری؛ آگهی خرید، فروش، رهن و اجاره خانه، آپارتمان، زمین و مغازه در ساری با تصاویر و مشخصات کامل.",
+    description: DESCRIPTION,
   keywords: ["املاک ساری", "خرید خانه ساری", "فروش ملک ساری", "رهن و اجاره ساری", "آپارتمان ساری", "مشاور املاک ساری"],
   openGraph: {
     type: "website",
@@ -36,16 +50,30 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon-v2.png", sizes: "180x180", type: "image/png" }],
     shortcut: ["/favicon-v2.ico"],
   },
-};
-
+    alternates: {
+      canonical: siteUrl,
+      languages: {
+        fa: siteUrl,
+        "fa-IR": "https://locationsari.ir",
+        "x-default": "https://locationsari.com",
+      },
+    },
+  };
+}
 export const viewport: Viewport = {
   themeColor: "#0145c9",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const host = (await headers()).get("host")?.toLowerCase().split(":")[0];
+  const siteUrl = getSiteUrl(host);
+
   return (
     <html lang="fa" dir="rtl">
       <head>
+        <link rel="alternate" hrefLang="fa" href={siteUrl} />
+        <link rel="alternate" hrefLang="fa-IR" href="https://locationsari.ir" />
+        <link rel="alternate" hrefLang="x-default" href="https://locationsari.com" />
         <meta name="enamad" content="55172089" />
         <meta name="google-site-verification" content="OZMTdnHyytnPIJrOV0HZCALmRyRWS3nOYcYRZpApseI" />
       </head>
