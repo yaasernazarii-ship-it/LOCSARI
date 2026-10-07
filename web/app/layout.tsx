@@ -67,10 +67,39 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const host = (await headers()).get("host")?.toLowerCase().split(":")[0];
   const siteUrl = getSiteUrl(host);
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${siteUrl}#organization`,
+        name: "لوکیشن ساری",
+        url: siteUrl,
+        logo: `${siteUrl}/icon-192-v2.png`,
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}#website`,
+        url: siteUrl,
+        name: "لوکیشن ساری",
+        inLanguage: "fa-IR",
+        publisher: { "@id": `${siteUrl}#organization` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${siteUrl}/amlak?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
 
   return (
     <html lang="fa" dir="rtl">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <link rel="alternate" hrefLang="fa" href={siteUrl} />
         <link rel="alternate" hrefLang="fa-IR" href="https://locationsari.ir" />
         <link rel="alternate" hrefLang="x-default" href="https://locationsari.com" />
