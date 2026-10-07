@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>آگهی‌های ملک ساری | لوکیشن ساری</title>
+<meta name="description" content="جست‌وجو و فیلتر آگهی‌های خرید، فروش، رهن و اجاره ملک در تمام مناطق ساری." />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body data-page="listings">
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-icon">🏠</span>
+      <span>لوکیشن ساری<small>خرید، فروش، رهن و اجاره</small></span>
+    </a>
+    <nav class="nav-menu">
+      <a href="index.html">خانه</a>
+      <a href="listings.html" class="active">آگهی‌های ملک</a>
+      <a href="add-listing.html">ثبت آگهی</a>
+      <a href="about.html">درباره و تماس</a>
+      <a href="favorites.html" class="nav-fav-link">🤍 علاقه‌مندی‌ها<span id="fav-count" class="fav-count" data-zero="true"></span></a>
+      <a href="add-listing.html" class="nav-cta">ثبت رایگان ملک</a>
+    </nav>
+    <button class="nav-toggle" aria-label="منو">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="section" style="padding-bottom:0;">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="index.html">خانه</a><span>/</span>
+      <span class="current">آگهی‌های ملک ساری</span>
+    </nav>
+    <div class="section-head">
+      <div>
+        <h2>آگهی‌های ملک در ساری</h2>
+        <p>با فیلتر دقیق، ملک مناسب خودتان را در بین آگهی‌های ساری پیدا کنید.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:20px;">
+  <div class="container">
+    <div class="listings-layout">
+      <aside class="filters-panel">
+        <h3>فیلتر جست‌وجو</h3>
+        <form id="filter-form">
+          <div class="filter-group">
+            <label>نوع معامله</label>
+            <select name="deal">
+              <option value="">همه</option>
+              <option value="sale">خرید و فروش</option>
+              <option value="rent">رهن و اجاره</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>نوع ملک</label>
+            <select name="type" data-fill="type">
+              <option value="">همه انواع</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>منطقه ساری</label>
+            <select name="neighborhood" data-fill="neighborhood">
+              <option value="">همه مناطق</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>تعداد اتاق</label>
+            <select name="rooms">
+              <option value="">فرقی نمی‌کند</option>
+              <option value="1">۱ خواب</option>
+              <option value="2">۲ خواب</option>
+              <option value="3">۳ خواب</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>متراژ (متر مربع)</label>
+            <div class="filter-row">
+              <input type="number" name="minArea" placeholder="از" min="0" />
+              <input type="number" name="maxArea" placeholder="تا" min="0" />
+            </div>
+          </div>
+          <div class="filter-group">
+            <label>قیمت / رهن (تومان)</label>
+            <div class="filter-row">
+              <input type="number" name="minPrice" placeholder="از" min="0" />
+              <input type="number" name="maxPrice" placeholder="تا" min="0" />
+            </div>
+          </div>
+          <div class="filter-group">
+            <label>امکانات</label>
+            <div class="filter-checks">
+              <label><input type="checkbox" name="elevator" /> آسانسور</label>
+              <label><input type="checkbox" name="parking" /> پارکینگ</label>
+              <label><input type="checkbox" name="warehouse" /> انباری</label>
+            </div>
+          </div>
+          <button type="button" id="clear-filters" class="btn btn-outline" style="width:100%; color:var(--primary); border-color:var(--primary);">پاک کردن فیلترها</button>
+        </form>
+      </aside>
+
+      <div>
+        <div class="results-head">
+          <div><strong id="result-count">۰</strong> آگهی پیدا شد</div>
+          <select id="sort-select">
+            <option value="newest">جدیدترین</option>
+            <option value="price-asc">ارزان‌ترین</option>
+            <option value="price-desc">گران‌ترین</option>
+            <option value="area-desc">بیشترین متراژ</option>
+            <option value="views-desc">پربازدیدترین</option>
+          </select>
+        </div>
+        <div id="listings-grid" class="listings-grid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h4>🏠 لوکیشن ساری</h4>
+        <p>مرجع تخصصی خرید، فروش، رهن و اجاره انواع ملک در شهر ساری.</p>
+      </div>
+      <div>
+        <h4>لینک‌های سریع</h4>
+        <ul>
+          <li><a href="index.html">خانه</a></li>
+          <li><a href="listings.html">آگهی‌های ملک</a></li>
+          <li><a href="add-listing.html">ثبت آگهی</a></li>
+          <li><a href="about.html">درباره ما و اعتبارات</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>انواع معامله</h4>
+        <ul>
+          <li><a href="listings.html?deal=sale">خرید و فروش</a></li>
+          <li><a href="listings.html?deal=rent">رهن و اجاره</a></li>
+          <li><a href="listings.html?type=apartment">آپارتمان</a></li>
+          <li><a href="listings.html?type=villa">ویلایی</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>تماس با ما</h4>
+        <ul>
+          <li>📍 ساری، بلوار طالقانی</li>
+          <li>📞 ۰۱۱-۳۳۳۳۰۰۰۰</li>
+          <li>📱 ۰۹۱۱-۰۰۰۰۰۰۰</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © <span id="current-year"></span> لوکیشن ساری — تمامی حقوق محفوظ است.
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/api.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

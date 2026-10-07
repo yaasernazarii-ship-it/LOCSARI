@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>لوکیشن ساری | خرید، فروش، رهن و اجاره ملک در ساری</title>
+<meta name="description" content="مرجع تخصصی خرید، فروش، رهن و اجاره آپارتمان، ویلا، زمین، مغازه و دفتر اداری در شهر ساری." />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body data-page="home">
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-icon">🏠</span>
+      <span>لوکیشن ساری<small>خرید، فروش، رهن و اجاره</small></span>
+    </a>
+    <nav class="nav-menu">
+      <a href="index.html" class="active">خانه</a>
+      <a href="listings.html">آگهی‌های ملک</a>
+      <a href="add-listing.html">ثبت آگهی</a>
+      <a href="about.html">درباره و تماس</a>
+      <a href="favorites.html" class="nav-fav-link">🤍 علاقه‌مندی‌ها<span id="fav-count" class="fav-count" data-zero="true"></span></a>
+      <a href="add-listing.html" class="nav-cta">ثبت رایگان ملک</a>
+    </nav>
+    <button class="nav-toggle" aria-label="منو">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>خرید، فروش، رهن و اجاره ملک در ساری</h1>
+    <p>مرجع تخصصی معاملات آپارتمان، ویلا، زمین، مغازه و دفتر اداری، فقط در شهر ساری. جست‌وجوی هوشمند و سریع در آگهی‌های به‌روز.</p>
+
+    <form id="hero-search" class="search-box">
+      <select name="deal" aria-label="نوع معامله">
+        <option value="">نوع معامله</option>
+        <option value="sale">خرید و فروش</option>
+        <option value="rent">رهن و اجاره</option>
+      </select>
+      <select name="type" data-fill="type" aria-label="نوع ملک">
+        <option value="">نوع ملک</option>
+      </select>
+      <select name="neighborhood" data-fill="neighborhood" aria-label="منطقه">
+        <option value="">همه مناطق ساری</option>
+      </select>
+      <input type="number" name="minArea" placeholder="حداقل متراژ" min="0" />
+      <button type="submit">🔍 جست‌وجو</button>
+    </form>
+  </div>
+</section>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat-card"><div class="num">+20</div><div class="label">آگهی فعال</div></div>
+    <div class="stat-card"><div class="num">۱۶</div><div class="label">منطقه تحت پوشش در ساری</div></div>
+    <div class="stat-card"><div class="num">۷</div><div class="label">نوع ملک متفاوت</div></div>
+    <div class="stat-card"><div class="num">۲۴/۷</div><div class="label">پاسخگویی به مشاوره</div></div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <h2>آگهی‌های ویژه</h2>
+        <p>منتخبی از بهترین فرصت‌های ملکی این هفته در ساری</p>
+      </div>
+      <a href="listings.html" class="see-all">مشاهده همه آگهی‌ها ←</a>
+    </div>
+    <div id="featured-listings" class="listings-grid"></div>
+  </div>
+</section>
+
+<section class="section bg-alt">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <h2>چرا لوکیشن ساری؟</h2>
+        <p>تجربه‌ای مطمئن و شفاف برای معاملات ملکی شما در ساری</p>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon">📍</div>
+        <h3>تخصص کامل روی ساری</h3>
+        <p>فقط و فقط ملک‌های داخل شهر ساری، بدون سردرگمی در آگهی‌های شهرهای دیگر.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">✅</div>
+        <h3>آگهی‌های راستی‌آزمایی‌شده</h3>
+        <p>بازدید و بررسی اولیه هر ملک پیش از انتشار در سایت.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">⚡</div>
+        <h3>جست‌وجوی سریع و هوشمند</h3>
+        <p>فیلتر بر اساس نوع معامله، منطقه، متراژ، قیمت و تعداد اتاق.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🤝</div>
+        <h3>مشاوره رایگان</h3>
+        <p>همراهی مشاوران ما از انتخاب ملک تا تنظیم قرارداد نهایی.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-banner">
+      <div>
+        <h2>می‌خواهید ملک خود را بفروشید یا اجاره دهید؟</h2>
+        <p>ملک خود را رایگان ثبت کنید تا در سریع‌ترین زمان با شما تماس بگیریم.</p>
+      </div>
+      <a href="add-listing.html" class="btn btn-outline">ثبت آگهی رایگان</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h4>🏠 لوکیشن ساری</h4>
+        <p>مرجع تخصصی خرید، فروش، رهن و اجاره انواع ملک در شهر ساری. همراه شما در یکی از مهم‌ترین تصمیم‌های زندگی.</p>
+      </div>
+      <div>
+        <h4>لینک‌های سریع</h4>
+        <ul>
+          <li><a href="index.html">خانه</a></li>
+          <li><a href="listings.html">آگهی‌های ملک</a></li>
+          <li><a href="add-listing.html">ثبت آگهی</a></li>
+          <li><a href="about.html">درباره ما و اعتبارات</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>انواع معامله</h4>
+        <ul>
+          <li><a href="listings.html?deal=sale">خرید و فروش</a></li>
+          <li><a href="listings.html?deal=rent">رهن و اجاره</a></li>
+          <li><a href="listings.html?type=apartment">آپارتمان</a></li>
+          <li><a href="listings.html?type=villa">ویلایی</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>تماس با ما</h4>
+        <ul>
+          <li>📍 ساری، بلوار طالقانی</li>
+          <li>📞 ۰۱۱-۳۳۳۳۰۰۰۰</li>
+          <li>📱 ۰۹۱۱-۰۰۰۰۰۰۰</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © <span id="current-year"></span> لوکیشن ساری — تمامی حقوق محفوظ است.
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/api.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ثبت آگهی ملک | لوکیشن ساری</title>
+<meta name="description" content="ملک خود در ساری را رایگان ثبت کنید تا مشاوران ما با شما تماس بگیرند." />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body data-page="add-listing">
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-icon">🏠</span>
+      <span>لوکیشن ساری<small>خرید، فروش، رهن و اجاره</small></span>
+    </a>
+    <nav class="nav-menu">
+      <a href="index.html">خانه</a>
+      <a href="listings.html">آگهی‌های ملک</a>
+      <a href="add-listing.html" class="active">ثبت آگهی</a>
+      <a href="about.html">درباره و تماس</a>
+      <a href="favorites.html" class="nav-fav-link">🤍 علاقه‌مندی‌ها<span id="fav-count" class="fav-count" data-zero="true"></span></a>
+      <a href="add-listing.html" class="nav-cta">ثبت رایگان ملک</a>
+    </nav>
+    <button class="nav-toggle" aria-label="منو">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head" style="justify-content:center; text-align:center; flex-direction:column;">
+      <h2>ثبت رایگان آگهی ملک</h2>
+      <p>مشخصات ملک خود را وارد کنید؛ اطلاعات مستقیم برای مشاوران ما در واتساپ ارسال می‌شود و در سریع‌ترین زمان با شما تماس می‌گیریم.</p>
+    </div>
+
+    <div class="form-card">
+      <div id="form-success" class="success-box" hidden>
+        ✅ درخواست شما آماده ارسال شد. در پنجره‌ی باز شده، پیام واتساپ را برای ما ارسال کنید تا بررسی و تماس گرفته شود.
+      </div>
+
+      <form id="add-listing-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>نوع معامله</label>
+            <select name="deal" required>
+              <option value="sale">خرید و فروش</option>
+              <option value="rent">رهن و اجاره</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>نوع ملک</label>
+            <select name="type" data-fill="type" required></select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>منطقه (ساری)</label>
+            <select name="neighborhood" data-fill="neighborhood" required></select>
+          </div>
+          <div class="form-group">
+            <label>متراژ (متر مربع)</label>
+            <input type="number" name="area" min="1" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>قیمت / رهن و اجاره پیشنهادی (تومان)</label>
+          <input type="text" name="price" placeholder="مثلاً: ۳ میلیارد یا رهن ۲۰۰م اجاره ۱۰م" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>نام و نام خانوادگی مالک</label>
+            <input type="text" name="name" required />
+          </div>
+          <div class="form-group">
+            <label>شماره تماس</label>
+            <input type="tel" name="phone" pattern="[0-9]{10,11}" placeholder="09xxxxxxxxx" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>توضیحات تکمیلی</label>
+          <textarea name="description" placeholder="ویژگی‌های خاص ملک، آدرس تقریبی، سال ساخت و..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;">ارسال درخواست ثبت آگهی</button>
+      </form>
+    </div>
+
+    <div id="account-listing-panel"></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h4>🏠 لوکیشن ساری</h4>
+        <p>مرجع تخصصی خرید، فروش، رهن و اجاره انواع ملک در شهر ساری.</p>
+      </div>
+      <div>
+        <h4>لینک‌های سریع</h4>
+        <ul>
+          <li><a href="index.html">خانه</a></li>
+          <li><a href="listings.html">آگهی‌های ملک</a></li>
+          <li><a href="add-listing.html">ثبت آگهی</a></li>
+          <li><a href="about.html">درباره ما و اعتبارات</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>انواع معامله</h4>
+        <ul>
+          <li><a href="listings.html?deal=sale">خرید و فروش</a></li>
+          <li><a href="listings.html?deal=rent">رهن و اجاره</a></li>
+          <li><a href="listings.html?type=apartment">آپارتمان</a></li>
+          <li><a href="listings.html?type=villa">ویلایی</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>تماس با ما</h4>
+        <ul>
+          <li>📍 ساری، بلوار طالقانی</li>
+          <li>📞 ۰۱۱-۳۳۳۳۰۰۰۰</li>
+          <li>📱 ۰۹۱۱-۰۰۰۰۰۰۰</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © <span id="current-year"></span> لوکیشن ساری — تمامی حقوق محفوظ است.
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/api.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

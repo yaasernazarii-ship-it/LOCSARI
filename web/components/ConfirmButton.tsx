@@ -1,0 +1,53 @@
+"use client";
+
+// جایگزین window.confirm برای عملیات حساس در پنل مدیریت — تأیید درون‌خطی به‌جای پنجرهٔ مرورگر.
+
+import { useState } from "react";
+
+export default function ConfirmButton({
+  label,
+  confirmText = "مطمئن هستید؟",
+  confirmLabel = "بله",
+  cancelLabel = "انصراف",
+  className = "btn-danger",
+  disabled,
+  onConfirm,
+}: {
+  label: string;
+  confirmText?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  className?: string;
+  disabled?: boolean;
+  onConfirm: () => void | Promise<void>;
+}) {
+  const [armed, setArmed] = useState(false);
+
+  if (armed) {
+    return (
+      <span className="confirm-inline fade-in">
+        <span className="confirm-inline__text">{confirmText}</span>
+        <button
+          type="button"
+          className={className}
+          disabled={disabled}
+          onClick={() => {
+            setArmed(false);
+            onConfirm();
+          }}
+        >
+          {confirmLabel}
+        </button>
+        <button type="button" className="btn-secondary" onClick={() => setArmed(false)}>
+          {cancelLabel}
+        </button>
+      </span>
+    );
+  }
+
+  return (
+    <button type="button" className={className} disabled={disabled} onClick={() => setArmed(true)}>
+      {label}
+    </button>
+  );
+}

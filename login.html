@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ورود به حساب کاربری | لوکیشن ساری</title>
+<meta name="description" content="ورود به حساب کاربری لوکیشن ساری برای گفتگو با خریدار/فروشنده، مدیریت آگهی‌ها و ویژه‌سازی." />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body data-page="login">
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-icon">🏠</span>
+      <span>لوکیشن ساری<small>خرید، فروش، رهن و اجاره</small></span>
+    </a>
+    <nav class="nav-menu">
+      <a href="index.html">خانه</a>
+      <a href="listings.html">آگهی‌های ملک</a>
+      <a href="add-listing.html">ثبت آگهی</a>
+      <a href="about.html">درباره و تماس</a>
+      <a href="favorites.html" class="nav-fav-link">🤍 علاقه‌مندی‌ها<span id="fav-count" class="fav-count" data-zero="true"></span></a>
+      <a href="add-listing.html" class="nav-cta">ثبت رایگان ملک</a>
+    </nav>
+    <button class="nav-toggle" aria-label="منو">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container" style="max-width:440px;">
+    <div class="section-head" style="justify-content:center; text-align:center; flex-direction:column;">
+      <h2>ورود به حساب کاربری</h2>
+      <p>برای گفتگو با خریدار/فروشنده، مدیریت آگهی‌ها و ویژه‌سازی وارد شوید.</p>
+    </div>
+
+    <div class="form-card">
+      <div id="auth-error" class="auth-error" hidden></div>
+      <form id="login-form">
+        <div class="form-group">
+          <label>شماره موبایل</label>
+          <input type="tel" name="phone" pattern="09[0-9]{9}" placeholder="09xxxxxxxxx" required />
+        </div>
+        <div class="form-group">
+          <label>رمز عبور</label>
+          <input type="password" name="password" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">ورود</button>
+      </form>
+      <p style="text-align:center; margin-top:16px; font-size:0.9rem;">
+        حساب کاربری ندارید؟ <a href="register.html" style="color:var(--primary); font-weight:700;">ثبت‌نام</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h4>🏠 لوکیشن ساری</h4>
+        <p>مرجع تخصصی خرید، فروش، رهن و اجاره انواع ملک در شهر ساری.</p>
+      </div>
+      <div>
+        <h4>لینک‌های سریع</h4>
+        <ul>
+          <li><a href="index.html">خانه</a></li>
+          <li><a href="listings.html">آگهی‌های ملک</a></li>
+          <li><a href="add-listing.html">ثبت آگهی</a></li>
+          <li><a href="about.html">درباره ما و اعتبارات</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>انواع معامله</h4>
+        <ul>
+          <li><a href="listings.html?deal=sale">خرید و فروش</a></li>
+          <li><a href="listings.html?deal=rent">رهن و اجاره</a></li>
+          <li><a href="listings.html?type=apartment">آپارتمان</a></li>
+          <li><a href="listings.html?type=villa">ویلایی</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>تماس با ما</h4>
+        <ul>
+          <li>📍 ساری، بلوار طالقانی</li>
+          <li>📞 ۰۱۱-۳۳۳۳۰۰۰۰</li>
+          <li>📱 ۰۹۱۱-۰۰۰۰۰۰۰</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © <span id="current-year"></span> لوکیشن ساری — تمامی حقوق محفوظ است.
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/api.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

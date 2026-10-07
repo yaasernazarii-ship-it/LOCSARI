@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>آگهی‌های ذخیره‌شده من | لوکیشن ساری</title>
+<meta name="description" content="آگهی‌های ملک ساری که در لوکیشن ساری علاقه‌مند شده‌اید." />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body data-page="favorites">
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-icon">🏠</span>
+      <span>لوکیشن ساری<small>خرید، فروش، رهن و اجاره</small></span>
+    </a>
+    <nav class="nav-menu">
+      <a href="index.html">خانه</a>
+      <a href="listings.html">آگهی‌های ملک</a>
+      <a href="add-listing.html">ثبت آگهی</a>
+      <a href="about.html">درباره و تماس</a>
+      <a href="favorites.html" class="nav-fav-link active">🤍 علاقه‌مندی‌ها<span id="fav-count" class="fav-count" data-zero="true"></span></a>
+      <a href="add-listing.html" class="nav-cta">ثبت رایگان ملک</a>
+    </nav>
+    <button class="nav-toggle" aria-label="منو">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="index.html">خانه</a><span>/</span>
+      <span class="current">آگهی‌های ذخیره‌شده من</span>
+    </nav>
+    <div class="section-head">
+      <div>
+        <h2>آگهی‌های ذخیره‌شده من</h2>
+        <p><strong id="fav-result-count">۰</strong> آگهی در لیست علاقه‌مندی‌های شما (فقط روی همین مرورگر ذخیره می‌شود)</p>
+      </div>
+      <a href="listings.html" class="see-all">مشاهده همه آگهی‌ها ←</a>
+    </div>
+    <div id="favorites-grid" class="listings-grid"></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h4>🏠 لوکیشن ساری</h4>
+        <p>مرجع تخصصی خرید، فروش، رهن و اجاره انواع ملک در شهر ساری.</p>
+      </div>
+      <div>
+        <h4>لینک‌های سریع</h4>
+        <ul>
+          <li><a href="index.html">خانه</a></li>
+          <li><a href="listings.html">آگهی‌های ملک</a></li>
+          <li><a href="add-listing.html">ثبت آگهی</a></li>
+          <li><a href="about.html">درباره ما و اعتبارات</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>انواع معامله</h4>
+        <ul>
+          <li><a href="listings.html?deal=sale">خرید و فروش</a></li>
+          <li><a href="listings.html?deal=rent">رهن و اجاره</a></li>
+          <li><a href="listings.html?type=apartment">آپارتمان</a></li>
+          <li><a href="listings.html?type=villa">ویلایی</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>تماس با ما</h4>
+        <ul>
+          <li>📍 ساری، بلوار طالقانی</li>
+          <li>📞 ۰۱۱-۳۳۳۳۰۰۰۰</li>
+          <li>📱 ۰۹۱۱-۰۰۰۰۰۰۰</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © <span id="current-year"></span> لوکیشن ساری — تمامی حقوق محفوظ است.
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/api.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

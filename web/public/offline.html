@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>عدم دسترسی به اینترنت | لوکیشن ساری</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Tahoma, sans-serif;
+      background: linear-gradient(160deg, #24ac80, #17805e);
+      color: #fff;
+      text-align: center;
+      padding: 24px;
+    }
+    .box { max-width: 360px; }
+    img { width: 96px; height: 96px; margin-bottom: 16px; }
+    h1 { font-size: 20px; margin: 0 0 8px; }
+    p { font-size: 14px; opacity: 0.9; margin: 0 0 20px; line-height: 1.8; }
+    button {
+      background: #fff;
+      color: #17805e;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <img src="/icon-192-v2.png" alt="لوکیشن ساری" />
+    <h1>اتصال اینترنت برقرار نیست</h1>
+    <p>به‌نظر می‌رسد به اینترنت متصل نیستید. لطفاً اتصال خود را بررسی کنید و دوباره تلاش کنید.</p>
+    <button onclick="location.reload()">تلاش مجدد</button>
+  </div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { showToast } from "@/lib/adminToast";
+
+// ثبت آگهی CIP بدون پرداخت — فقط مدیر کل. درخواست مستقیماً با وضعیت «پرداخت‌شده» ثبت می‌شود.
+export default function AdminCipFreePublishForm({
+  plans,
+  advertisements,
+}: {
+  plans: { id: number; title: string; price: number }[];
+  advertisements: { id: number; title: string; user_name: string }[];
+}) {
+  const router = useRouter();
+  const [planId, setPlanId] = useState("");
+  const [advertisementId, setAdvertisementId] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/cip-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId, advertisementId, videoUrl: videoUrl.trim() || null }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || "خطا در ثبت درخواست CIP");
+      showToast(videoUrl.trim() ? "آگهی CIP بدون پرداخت منتشر شد" : "درخواست CIP بدون پرداخت ثبت شد", "success");
+      setPlanId("");
+      setAdvertisementId("");
+      setVideoUrl("");
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "خطا در ثبت درخواست CIP");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const canSubmit = planId !== "" && advertisementId !== "";
+
+  return (
+    <form onSubmit={onSubmit} className="form-section fade-in">
+      <h2>انتشار آگهی CIP بدون پرداخت (مدیر کل)</h2>
+      <p className="form-hint">
+        این بخش فقط برای مدیر کل است. آگهی انتخاب‌شده بدون طی کردن درگاه پرداخت، مستقیماً به‌عنوان
+        «پرداخت‌شده» ثبت می‌شود و در صورت ثبت لینک آپارات، همان لحظه در صفحهٔ عمومی CIP منتشر می‌شود.
+      </p>
+      {error && <p className="my-ad__error" style={{ marginBottom: 12 }}>{error}</p>}
+
+      <div className="form-group">
+        <label>آگهی</label>
+        <select value={advertisementId} onChange={(e) => setAdvertisementId(e.target.value)}>
+          <option value="">انتخاب آگهی...</option>
+          {advertisements.map((ad) => (
+            <option key={ad.id} value={ad.id}>
+              {ad.title} — {ad.user_name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label>پلن CIP</label>
+        <select value={planId} onChange={(e) => setPlanId(e.target.value)}>
+          <option value="">انتخاب پلن...</option>
+          {plans.map((plan) => (
+            <option key={plan.id} value={plan.id}>
+              {plan.title}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label>لینک ویدیوی آپارات (اختیاری)</label>
+        <input
+          type="url"
+          dir="ltr"
+          placeholder="https://www.aparat.com/v/xxxxx"
+          value={videoUrl}
+          onChange={(e) => setVideoUrl(e.target.value)}
+        />
+        <small>اگر وارد شود، آگهی همان لحظه منتشر می‌شود؛ در غیر این صورت در مرحلهٔ «پرداخت‌شده» می‌ماند.</small>
+      </div>
+
+      <div className="admin-actions-bar">
+        <button type="submit" className="btn-primary" disabled={saving || !canSubmit}>
+          {saving ? "در حال ثبت..." : "ثبت بدون پرداخت"}
+        </button>
+      </div>
+    </form>
+  );
+}
