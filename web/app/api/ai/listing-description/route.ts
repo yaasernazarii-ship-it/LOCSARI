@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است" }, { status: 429 });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) return NextResponse.json({ error: "دستیار هوشمند هنوز پیکربندی نشده است" }, { status: 503 });
 
   const body = await req.json().catch(() => null);
@@ -35,18 +35,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "برای تولید توضیحات، عنوان و دسته‌بندی را وارد کنید" }, { status: 400 });
   }
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-6",
+      model: "gpt-4.1-mini",
       max_tokens: 350,
-      system: "You write concise, accurate Persian property listing descriptions. Use only the provided facts. Do not invent amenities, claims, prices, addresses, or contact information. Return only the description in Persian, between 2 and 4 short sentences.",
-      messages: [{ role: "user", content: `اطلاعات آگهی:\n${JSON.stringify(details)}` }],
+      messages: [
+        {
+          role: "system",
+          content: "You write concise, accurate Persian property listing descriptions. Use only the provided facts. Do not invent amenities, claims, prices, addresses, or contact information. Return only the description in Persian, between 2 and 4 short sentences.",
+        },
+        { role: "user", content: `اطلاعات آگهی:\n${JSON.stringify(details)}` },
+      ],
     }),
   });
   const result = await response.json().catch(() => null);
@@ -63,7 +67,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error }, { status: 502 });
   }
 
-  const description = result?.content?.find((item: { type?: string }) => item.type === "text")?.text?.trim();
+  const description = result?.choices?.[0]?.message?.content?.trim();
   if (!description) return NextResponse.json({ error: "توضیح قابل استفاده‌ای تولید نشد" }, { status: 502 });
   return NextResponse.json({ description });
 }
