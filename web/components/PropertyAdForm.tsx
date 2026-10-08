@@ -824,7 +824,12 @@ export default function PropertyAdForm(props: Props) {
           </div>
           <div className="form-group">
             <label>تعداد اتاق خواب</label>
-            <input type="number" min={0} value={base.bedrooms} onChange={(e) => updateBase({ bedrooms: e.target.value })} />
+            <select value={base.bedrooms} onChange={(e) => updateBase({ bedrooms: e.target.value })}>
+              <option value="">انتخاب کنید</option>
+              {Array.from({ length: 5 }, (_, index) => index + 1).map((bedrooms) => (
+                <option key={bedrooms} value={bedrooms}>{bedrooms.toLocaleString("fa-IR")}</option>
+              ))}
+            </select>
           </div>
           <div className="form-group">
             <label>سال ساخت</label>
