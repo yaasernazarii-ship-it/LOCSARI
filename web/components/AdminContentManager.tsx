@@ -12,6 +12,9 @@ type Page = {
   is_published: boolean;
   sort_order: number;
   updated_at: string | Date;
+  system?: boolean;
+  contentPath?: string;
+  publicPath?: string;
 };
 
 type Props = { pages: Page[]; canCreate: boolean; canEdit: boolean; canDelete: boolean };
@@ -52,11 +55,11 @@ export default function AdminContentManager({ pages, canCreate, canEdit, canDele
               <tbody>
                 {visible.map((item) => <tr key={item.id}>
                   <td>{item.title}</td>
-                  <td dir="ltr" style={{ textAlign: "left" }}><span>/p/{item.slug}</span> <a href={`/p/${item.slug}`} target="_blank" rel="noreferrer" className="content-preview-link" aria-label={`مشاهدهٔ ${item.title}`}>↗</a></td>
+                  <td dir="ltr" style={{ textAlign: "left" }}><span>{item.publicPath ?? `/p/${item.slug}`}</span> <a href={item.publicPath ?? `/p/${item.slug}`} target="_blank" rel="noreferrer" className="content-preview-link" aria-label={`مشاهدهٔ ${item.title}`}>↗</a></td>
                   <td><span className={`status-badge status-badge--${item.is_published ? "approved" : "draft"}`}>{item.is_published ? "منتشرشده" : "پیش‌نویس"}</span></td>
                   <td>{item.sort_order.toLocaleString("fa-IR")}</td>
                   <td>{new Date(item.updated_at).toLocaleString("fa-IR")}</td>
-                  {(canEdit || canDelete) && <td><AdminContentRowActions pageId={item.id} canEdit={canEdit} canDelete={canDelete} /></td>}
+                  {(canEdit || canDelete) && <td>{item.system ? <Link href={item.contentPath ?? "/admin/content/site"} className="btn-secondary admin-header-btn">ویرایش محتوا</Link> : <AdminContentRowActions pageId={item.id} canEdit={canEdit} canDelete={canDelete} />}</td>}
                 </tr>)}
                 {visible.length === 0 && <tr><td colSpan={canEdit || canDelete ? 6 : 5} className="search-empty">صفحه‌ای مطابق جست‌وجو پیدا نشد.</td></tr>}
               </tbody>

@@ -18,13 +18,21 @@ export default async function AdminContentPage() {
     db.selectFrom("site_pages").selectAll().orderBy("sort_order", "asc").orderBy("id", "asc").execute(),
   ]);
 
+  const systemPages = [
+    { id: -1, title: "صفحهٔ اصلی", slug: "", is_published: true, sort_order: -4, updated_at: new Date(), system: true, contentPath: "/admin/content/site/home", publicPath: "/" },
+    { id: -2, title: "آگهی‌های VIP", slug: "vip", is_published: true, sort_order: -3, updated_at: new Date(), system: true, contentPath: "/admin/content/site/vip", publicPath: "/vip" },
+    { id: -3, title: "آگهی‌های CIP", slug: "cip", is_published: true, sort_order: -2, updated_at: new Date(), system: true, contentPath: "/admin/content/site/cip", publicPath: "/cip" },
+    { id: -4, title: "تماس با ما", slug: "contact", is_published: true, sort_order: -1, updated_at: new Date(), system: true, contentPath: "/admin/content/site/contact", publicPath: "/contact" },
+  ];
+  const allPages = [...systemPages, ...pages];
+
   return (
     <>
       <div className="admin-page-header">
         <h1>محتوا</h1>
         <p>مدیریت صفحات سایت و متن‌ها و بنرهای صفحهٔ اصلی در یکجا.</p>
       </div>
-      <AdminContentManager pages={pages} canCreate={canCreate} canEdit={canEdit} canDelete={canDelete} />
+      <AdminContentManager pages={allPages} canCreate={canCreate} canEdit={canEdit} canDelete={canDelete} />
     </>
   );
 }

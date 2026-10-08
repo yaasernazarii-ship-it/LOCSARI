@@ -60,10 +60,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     update.body = body.body;
   }
   if (body.videoUrl !== undefined) {
-    if (body.videoUrl !== null && !isValidAparatUrl(body.videoUrl)) {
-      return NextResponse.json({ error: "لینک ویدیو باید یک آدرس معتبر آپارات باشد" }, { status: 400 });
+    const videoUrl = typeof body.videoUrl === "string" ? body.videoUrl.trim() : null;
+    const isUploadedVideo = !!videoUrl && videoUrl.startsWith(`/uploads/site-pages/${id}/videos/`);
+    if (body.videoUrl !== null && (typeof body.videoUrl !== "string" || (!isValidAparatUrl(videoUrl) && !isUploadedVideo))) {
+      return NextResponse.json({ error: "ویدیو باید از آپارات یا فایل آپلودشدهٔ همین صفحه باشد" }, { status: 400 });
     }
-    update.video_url = typeof body.videoUrl === "string" ? body.videoUrl.trim() : null;
+    update.video_url = videoUrl;
   }
   if (body.seoTitle !== undefined) {
     if (body.seoTitle !== null && (typeof body.seoTitle !== "string" || body.seoTitle.trim().length > 200)) {

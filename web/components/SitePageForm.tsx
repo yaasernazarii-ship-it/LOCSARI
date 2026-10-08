@@ -42,6 +42,8 @@ export default function SitePageForm(props: Props) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadAlt, setUploadAlt] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
 
   useEffect(() => {
     if (props.mode !== "edit") return;
@@ -76,6 +78,26 @@ export default function SitePageForm(props: Props) {
   function insertImage() {
     const url = window.prompt("آدرس تصویر را وارد کنید");
     if (url?.trim()) format("insertImage", url.trim());
+  }
+
+  async function uploadVideo() {
+    if (props.mode !== "edit" || !videoFile) return;
+    setUploadingVideo(true);
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.append("file", videoFile);
+      const response = await fetch(`/api/admin/content/pages/${props.pageId}/video`, { method: "POST", body: formData });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "خطا در آپلود ویدیو");
+      setVideoUrl(data.url);
+      setVideoFile(null);
+      showToast("ویدیو آپلود شد", "success");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "خطا در آپلود ویدیو");
+    } finally {
+      setUploadingVideo(false);
+    }
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -188,7 +210,15 @@ export default function SitePageForm(props: Props) {
         </div>
 
         <div className="form-group">
-          <label>لینک ویدیوی آپارات (اختیاری)</label>
+          <label>ویدیو (آپلود از دستگاه)</label>
+          <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={(event) => setVideoFile(event.target.files?.[0] ?? null)} />
+          <small>فرمت‌های mp4، webm و mov تا حداکثر ۳۰ مگابایت.</small>
+          <div className="admin-actions-bar" style={{ marginTop: 8 }}>
+            <button type="button" className="btn-secondary" disabled={!videoFile || uploadingVideo} onClick={uploadVideo}>{uploadingVideo ? "در حال آپلود..." : "آپلود ویدیو"}</button>
+          </div>
+        </div>
+
+        <div className="form-group">
           <input
             type="text"
             dir="ltr"
@@ -241,7 +271,7 @@ export default function SitePageForm(props: Props) {
         <div className="form-section fade-in">
           <h2>تصاویر صفحه (مثلاً اعتبارات و مجوزات)</h2>
           <p className="form-hint">
-            تصاویری که اینجا اضافه می‌کنید در انتهای همین صفحه، زیر عنوان «اعتبارات و مجوزات» نمایش داده می‌شوند (تصویر: jpg، png، webp — حداکثر ۱۰ مگابایت).
+            تصاویر jpg، png و webp تا حداکثر ۳۰ مگابایت پذیرفته می‌شوند.
           </p>
 
           {images.length > 0 && (

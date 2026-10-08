@@ -44,10 +44,18 @@ export default async function StaticContentPage({ params, searchParams }: Props)
 
   const images = await getPageImages(page.id);
   const embedUrl = page.video_url ? toAparatEmbedUrl(page.video_url) : null;
+  const uploadedVideoUrl = page.video_url?.startsWith(`/uploads/site-pages/${page.id}/videos/`) ? page.video_url : null;
 
   return (
     <div className="static-page">
       <h1>{page.title}</h1>
+      {uploadedVideoUrl && (
+        <div className="static-page__video">
+          <video controls preload="metadata" src={uploadedVideoUrl}>
+            مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
+          </video>
+        </div>
+      )}
       {embedUrl && (
         <div className="static-page__video">
           <iframe src={embedUrl} allowFullScreen title={page.title} />
