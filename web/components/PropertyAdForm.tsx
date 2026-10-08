@@ -177,14 +177,20 @@ function isDuplicateBaseField(field: CategoryField): boolean {
   return field.key === "sale_sakht" || field.key === "built_year";
 }
 
-function numericPriceOnly(value: string): string {
-  const normalized = value.replace(/[.,٫،٬]/g, "/").replace(/[^\d۰-۹/]/g, "");
-  const [integerPart, ...fractionParts] = normalized.split("/");
-  return fractionParts.length > 0 ? `${integerPart}/${fractionParts.join("")}` : integerPart;
+function formatPriceWithSlashes(value: string): string {
+  const digits = value
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/\D/g, "");
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, "/");
 }
 
 function priceDisplayValue(value: unknown): string {
-  return value === null || value === undefined ? "" : numericPriceOnly(String(value));
+  return value === null || value === undefined ? "" : formatPriceWithSlashes(String(Math.trunc(Number(value))));
+}
+
+function priceOrNull(value: string): number | null {
+  const digits = value.replace(/\D/g, "");
+  return digits ? Number(digits) : null;
 }
 
 function numOrNull(s: string): number | null {
@@ -555,10 +561,10 @@ export default function PropertyAdForm(props: Props) {
       };
       if (isApprovedConsultant && attributeAsConsultant) body.attributeAsConsultant = true;
       if (isRent) {
-        body.deposit = numOrNull(adForm.deposit) ?? 0;
-        body.monthlyRent = numOrNull(adForm.monthlyRent) ?? 0;
+        body.deposit = priceOrNull(adForm.deposit) ?? 0;
+        body.monthlyRent = priceOrNull(adForm.monthlyRent) ?? 0;
       } else {
-        body.price = numOrNull(adForm.price);
+        body.price = priceOrNull(adForm.price);
       }
       const res = await fetch("/api/advertisements", {
         method: "POST",
@@ -633,11 +639,11 @@ export default function PropertyAdForm(props: Props) {
         transactionType,
       };
       if (isRent) {
-        adBody.deposit = numOrNull(adForm.deposit) ?? 0;
-        adBody.monthlyRent = numOrNull(adForm.monthlyRent) ?? 0;
+        adBody.deposit = priceOrNull(adForm.deposit) ?? 0;
+        adBody.monthlyRent = priceOrNull(adForm.monthlyRent) ?? 0;
         adBody.price = null;
       } else {
-        adBody.price = numOrNull(adForm.price);
+        adBody.price = priceOrNull(adForm.price);
         adBody.deposit = null;
         adBody.monthlyRent = null;
       }
@@ -1059,12 +1065,12 @@ export default function PropertyAdForm(props: Props) {
                 <label>مبلغ رهن (تومان)</label>
                 <input
                   type="text"
-                  inputMode="decimal"
-                  pattern="[0-9۰-۹/]*"
+                  inputMode="numeric"
+                  pattern="[0-9/]*"
                   dir="ltr"
-                  placeholder="مثال: ۱۲۵۰/۵۰"
+                  placeholder="مثال: ۱/۲۵۰/۰۰۰"
                   value={adForm.deposit}
-                  onChange={(e) => setAdForm((f) => ({ ...f, deposit: numericPriceOnly(e.target.value) }))}
+                  onChange={(e) => setAdForm((f) => ({ ...f, deposit: formatPriceWithSlashes(e.target.value) }))}
                 />
                 {tomanInWords(adForm.deposit) && <small>{tomanInWords(adForm.deposit)}</small>}
               </div>
@@ -1072,12 +1078,12 @@ export default function PropertyAdForm(props: Props) {
                 <label>اجارهٔ ماهانه (تومان)</label>
                 <input
                   type="text"
-                  inputMode="decimal"
-                  pattern="[0-9۰-۹/]*"
+                  inputMode="numeric"
+                  pattern="[0-9/]*"
                   dir="ltr"
-                  placeholder="مثال: ۱۲۵۰/۵۰"
+                  placeholder="مثال: ۱/۲۵۰/۰۰۰"
                   value={adForm.monthlyRent}
-                  onChange={(e) => setAdForm((f) => ({ ...f, monthlyRent: numericPriceOnly(e.target.value) }))}
+                  onChange={(e) => setAdForm((f) => ({ ...f, monthlyRent: formatPriceWithSlashes(e.target.value) }))}
                 />
                 {tomanInWords(adForm.monthlyRent) && <small>{tomanInWords(adForm.monthlyRent)}</small>}
               </div>
@@ -1087,12 +1093,12 @@ export default function PropertyAdForm(props: Props) {
               <label>قیمت (تومان) *</label>
               <input
                 type="text"
-                inputMode="decimal"
-                pattern="[0-9۰-۹/]*"
+                inputMode="numeric"
+                pattern="[0-9/]*"
                 dir="ltr"
-                placeholder="مثال: ۱۲۵۰/۵۰"
+                placeholder="مثال: ۱/۲۵۰/۰۰۰"
                 value={adForm.price}
-                onChange={(e) => setAdForm((f) => ({ ...f, price: numericPriceOnly(e.target.value) }))}
+                onChange={(e) => setAdForm((f) => ({ ...f, price: formatPriceWithSlashes(e.target.value) }))}
               />
               {tomanInWords(adForm.price) && <small>{tomanInWords(adForm.price)}</small>}
             </div>
