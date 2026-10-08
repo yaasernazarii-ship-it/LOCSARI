@@ -31,6 +31,10 @@ function normalizePersian(value: string): string {
   return value.replace(/[يى]/g, "ی").replace(/ك/g, "ک").replace(/[إأآ]/g, "ا").replace(/ة/g, "ه").toLocaleLowerCase("fa-IR");
 }
 
+function formatPersianInteger(value: number): string {
+  return String(Math.trunc(value)).replace(/\d/g, (digit) => "۰۱۲۳۴۵۶۷۸۹"[Number(digit)]);
+}
+
 const PERSIAN_ONES = ["", "یک", "دو", "سه", "چهار", "پنج", "شش", "هفت", "هشت", "نه"];
 const PERSIAN_TEENS = ["ده", "یازده", "دوازده", "سیزده", "چهارده", "پانزده", "شانزده", "هفده", "هجده", "نوزده"];
 const PERSIAN_TENS = ["", "", "بیست", "سی", "چهل", "پنجاه", "شصت", "هفتاد", "هشتاد", "نود"];
@@ -837,7 +841,7 @@ export default function PropertyAdForm(props: Props) {
               <option value="">انتخاب نشده</option>
               <option value="1369">قبل از ۱۳۷۰</option>
               {Array.from({ length: Math.trunc(CURRENT_PERSIAN_YEAR) - 1369 }, (_, i) => Math.trunc(CURRENT_PERSIAN_YEAR) - i).map((year) => (
-                <option key={year} value={year}>{year.toLocaleString("fa-IR", { maximumFractionDigits: 0 })}</option>
+                <option key={year} value={year}>{formatPersianInteger(year)}</option>
               ))}
             </select>
           </div>
