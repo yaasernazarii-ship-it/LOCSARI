@@ -402,6 +402,7 @@ export default function PropertyAdForm(props: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: base.title,
+          description: base.description,
           category: selectedCategory?.name ?? "",
           location: neighborhood?.name ?? "",
           area: base.area,

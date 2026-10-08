@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const details = {
     title: text(body?.title),
+    description: text(body?.description),
     category: text(body?.category),
     location: text(body?.location),
     area: text(body?.area),
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
         messages: [
           {
             role: "system",
-            content: "You are an expert Persian real-estate copywriter. Write an engaging, polished advertisement that begins with an appealing opening, highlights the listing's provided strengths naturally, and ends with a short invitation to contact for details. Use only the supplied facts: never invent amenities, prices, addresses, availability, guarantees, or contact information. Avoid generic filler, emojis, headings, and bullet points. Return only 3 to 5 fluent Persian sentences.",
+            content: "You are an expert Persian real-estate copywriter. Rewrite the provided description into an engaging, polished advertisement. Preserve every factual claim from the original description and the supplied fields; do not omit meaningful details. Begin with an appealing opening, highlight the listing's provided strengths naturally, and end with a short invitation to contact for details. Never invent amenities, prices, addresses, availability, guarantees, or contact information. Avoid generic filler, emojis, headings, and bullet points. If the original description is empty, write from the supplied fields only. Return only 3 to 5 fluent Persian sentences.",
           },
           { role: "user", content: `اطلاعات آگهی:\n${JSON.stringify(details)}` },
         ],
