@@ -177,6 +177,10 @@ function isDuplicateBaseField(field: CategoryField): boolean {
   return field.key === "sale_sakht" || field.key === "built_year";
 }
 
+function numericOnly(value: string): string {
+  return value.replace(/[^\d۰-۹]/g, "");
+}
+
 function numOrNull(s: string): number | null {
   const normalized = s.trim().replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)));
   if (!normalized) return null;
@@ -1047,18 +1051,27 @@ export default function PropertyAdForm(props: Props) {
             <div className="form-grid">
               <div className="form-group">
                 <label>مبلغ رهن (تومان)</label>
-                <input type="text" inputMode="decimal" dir="ltr" placeholder="مثال: 1250.50" value={adForm.deposit} onChange={(e) => setAdForm((f) => ({ ...f, deposit: e.target.value }))} />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9۰-۹]*"
+                  dir="ltr"
+                  placeholder="مثال: ۱۲۵۰"
+                  value={adForm.deposit}
+                  onChange={(e) => setAdForm((f) => ({ ...f, deposit: numericOnly(e.target.value) }))}
+                />
                 {tomanInWords(adForm.deposit) && <small>{tomanInWords(adForm.deposit)}</small>}
               </div>
               <div className="form-group">
                 <label>اجارهٔ ماهانه (تومان)</label>
                 <input
                   type="text"
-                  inputMode="decimal"
+                  inputMode="numeric"
+                  pattern="[0-9۰-۹]*"
                   dir="ltr"
-                  placeholder="مثال: 1250.50"
+                  placeholder="مثال: ۱۲۵۰"
                   value={adForm.monthlyRent}
-                  onChange={(e) => setAdForm((f) => ({ ...f, monthlyRent: e.target.value }))}
+                  onChange={(e) => setAdForm((f) => ({ ...f, monthlyRent: numericOnly(e.target.value) }))}
                 />
                 {tomanInWords(adForm.monthlyRent) && <small>{tomanInWords(adForm.monthlyRent)}</small>}
               </div>
@@ -1066,7 +1079,15 @@ export default function PropertyAdForm(props: Props) {
           ) : (
             <div className="form-group">
               <label>قیمت (تومان) *</label>
-              <input type="text" inputMode="decimal" dir="ltr" placeholder="مثال: 1250.50" value={adForm.price} onChange={(e) => setAdForm((f) => ({ ...f, price: e.target.value }))} />
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9۰-۹]*"
+                dir="ltr"
+                placeholder="مثال: ۱۲۵۰"
+                value={adForm.price}
+                onChange={(e) => setAdForm((f) => ({ ...f, price: numericOnly(e.target.value) }))}
+              />
               {tomanInWords(adForm.price) && <small>{tomanInWords(adForm.price)}</small>}
             </div>
           )}
