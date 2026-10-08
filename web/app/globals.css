@@ -296,8 +296,14 @@ textarea {
 
 .home-hero {
   background: linear-gradient(135deg, #0145c9 0%, #01266f 100%);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   color: #fff;
+  min-height: 360px;
   padding: 56px 20px;
+  display: grid;
+  place-items: center;
   text-align: center;
   animation: fadeInUp 0.5s ease-out;
 }
