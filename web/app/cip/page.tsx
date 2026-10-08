@@ -49,7 +49,7 @@ export default async function CipPage() {
 
       {introductionVideoUrl && (
         <section className="home-section cip-introduction">
-          <div className="home-section__heading"><span className="cip-eyebrow">CIP EXPERIENCE</span><h2>معرفی خدمات CIP</h2></div>
+          <div className="home-section__heading"><span className="cip-eyebrow">CIP EXPERIENCE</span><h2>{content["cip.intro_title"]}</h2><p>{content["cip.intro_description"]}</p></div>
           <div className="cip-introduction__video">
             <iframe title="معرفی خدمات CIP" src={introductionVideoUrl} allowFullScreen />
           </div>
