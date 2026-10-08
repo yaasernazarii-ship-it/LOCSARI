@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
           updated_at: new Date().toISOString(),
         })
         .where("id", "=", order.id)
-        .where("status", "=", "awaiting_payment")
+        .where("status", "=", "pending")
         .returning("id")
         .executeTakeFirst();
       if (!updated) return;
@@ -121,7 +121,7 @@ export async function GET(req: NextRequest) {
         .updateTable("payment_orders")
         .set({ status: "failed", error_code: "verify_error", updated_at: new Date().toISOString() })
         .where("id", "=", order.id)
-        .where("status", "=", "awaiting_payment")
+        .where("status", "=", "pending")
         .execute();
       await tx
         .updateTable("vip_subscriptions")
