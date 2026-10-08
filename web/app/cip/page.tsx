@@ -96,7 +96,7 @@ export default async function CipPage() {
               <h2>{plan.title}</h2>
               {plan.description && <p className="cip-plan-card__description">{plan.description}</p>}
               <p className="cip-plan-card__price">{formatToman(Number(plan.price))}</p>
-              <ul>{plan.features.split("\n").filter(Boolean).map((feature) => <li key={feature}><Check size={17} />{feature}</li>)}</ul>
+              <ul>{plan.features.split(/(?:\r?\n|\\n)/).filter(Boolean).map((feature) => <li key={feature}><Check size={17} />{feature.trim()}</li>)}</ul>
               <Link className="cip-plan-card__action" href={`/account/cip?plan=${plan.id}`}>انتخاب این پلن <span>←</span></Link>
             </article>
           ))}
