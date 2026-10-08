@@ -78,6 +78,7 @@ export default function SitePageForm(props: Props) {
     if (url?.trim()) format("insertImage", url.trim());
   }
 
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError("");
