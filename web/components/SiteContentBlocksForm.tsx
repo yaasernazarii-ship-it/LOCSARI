@@ -29,6 +29,7 @@ export default function SiteContentBlocksForm({ pageKeys }: { pageKeys?: string[
   const [values, setValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -43,6 +44,24 @@ export default function SiteContentBlocksForm({ pageKeys }: { pageKeys?: string[
       .catch((err) => setError(err instanceof Error ? err.message : "خطا در بارگذاری محتوا"))
       .finally(() => setLoading(false));
   }, [pageKeys]);
+
+  async function uploadMedia(contentKey: string, file: File) {
+    setUploadingKey(contentKey);
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/content/media", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "خطا در آپلود فایل");
+      setValues((current) => ({ ...current, [contentKey]: data.url }));
+      showToast("فایل آپلود شد؛ تغییرات را ذخیره کنید", "success");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "خطا در آپلود فایل");
+    } finally {
+      setUploadingKey(null);
+    }
+  }
 
   async function save() {
     setSaving(true);
@@ -77,6 +96,7 @@ export default function SiteContentBlocksForm({ pageKeys }: { pageKeys?: string[
       sectionKey,
       [...sectionBlocks,
         { content_key: `${groupKey}.${sectionKey}.image`, page_key: groupKey, section_key: sectionKey, label_fa: "تصویر یا بنر بخش", value: values[`${groupKey}.${sectionKey}.image`] ?? "" },
+        { content_key: `${groupKey}.${sectionKey}.video`, page_key: groupKey, section_key: sectionKey, label_fa: "ویدیوی بخش", value: values[`${groupKey}.${sectionKey}.video`] ?? "" },
         { content_key: `${groupKey}.${sectionKey}.button_url`, page_key: groupKey, section_key: sectionKey, label_fa: "لینک دکمهٔ بخش", value: values[`${groupKey}.${sectionKey}.button_url`] ?? "" },
       ],
     ] as [string, Block[]]);
@@ -94,8 +114,14 @@ export default function SiteContentBlocksForm({ pageKeys }: { pageKeys?: string[
               {sectionBlocks.map((block) => (
                 <div className="form-group" key={block.content_key}>
                   <label>{block.label_fa}</label>
-                  {block.content_key.endsWith(".image") || block.content_key.endsWith(".button_url") ? (
-                    <input type="url" dir="ltr" placeholder={block.content_key.endsWith(".image") ? "https://..." : "https://..."} value={values[block.content_key] ?? ""} onChange={(e) => setValues((current) => ({ ...current, [block.content_key]: e.target.value }))} />
+                  {block.content_key.endsWith(".image") || block.content_key.endsWith(".video") ? (
+                    <>
+                      <input type="file" accept={block.content_key.endsWith(".image") ? "image/jpeg,image/png,image/webp" : "video/mp4,video/webm,video/quicktime"} onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadMedia(block.content_key, file); }} disabled={uploadingKey === block.content_key} />
+                      <small>{block.content_key.endsWith(".image") ? "jpg، png یا webp تا ۳۰ مگابایت" : "mp4، webm یا mov تا ۳۰ مگابایت"}</small>
+                      {values[block.content_key] && <p className="form-hint" dir="ltr">{values[block.content_key]}</p>}
+                    </>
+                  ) : block.content_key.endsWith(".button_url") ? (
+                    <input type="url" dir="ltr" placeholder="https://..." value={values[block.content_key] ?? ""} onChange={(e) => setValues((current) => ({ ...current, [block.content_key]: e.target.value }))} />
                   ) : block.value.length > 120 ? (
                     <textarea rows={4} value={values[block.content_key] ?? ""} onChange={(e) => setValues((current) => ({ ...current, [block.content_key]: e.target.value }))} />
                   ) : (
