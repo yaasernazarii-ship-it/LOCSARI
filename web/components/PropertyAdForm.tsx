@@ -186,6 +186,7 @@ export default function PropertyAdForm(props: Props) {
   const [fields, setFields] = useState<CategoryField[]>([]);
   const [fieldsLoading, setFieldsLoading] = useState(false);
   const [locationQuery, setLocationQuery] = useState("");
+  const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
 
   // ---- state فرم ----
   const [base, setBase] = useState<BaseForm>(emptyBaseForm());
@@ -255,6 +256,12 @@ export default function PropertyAdForm(props: Props) {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (locationQuery || !base.neighborhoodId) return;
+    const selectedNeighborhood = neighborhoods.find((neighborhood) => neighborhood.id === Number(base.neighborhoodId));
+    if (selectedNeighborhood) setLocationQuery(selectedNeighborhood.name);
+  }, [base.neighborhoodId, locationQuery, neighborhoods]);
 
   // ---- فیلدهای اختصاصی دستهٔ انتخاب‌شده ----
   useEffect(() => {
@@ -756,34 +763,44 @@ export default function PropertyAdForm(props: Props) {
             </div>
           )}
           <div className="form-group">
-            <label>موقعیت ملک</label>
-            <input value={locationQuery} onChange={(e) => setLocationQuery(e.target.value)} placeholder="جست‌وجوی محله؛ مثلاً امیرمازندرانی" />
-            {locationQuery.trim() && (
-              <div className="location-search-results">
+            <label htmlFor="property-neighborhood">موقعیت ملک</label>
+            <input
+              id="property-neighborhood"
+              value={locationQuery}
+              onFocus={() => setIsLocationPickerOpen(true)}
+              onChange={(e) => {
+                setLocationQuery(e.target.value);
+                updateBase({ neighborhoodId: "" });
+                setIsLocationPickerOpen(true);
+              }}
+              placeholder="جست‌وجو یا انتخاب منطقه؛ مثلاً امیرمازندرانی"
+              role="combobox"
+              aria-expanded={isLocationPickerOpen}
+              aria-controls="property-neighborhood-options"
+              aria-autocomplete="list"
+            />
+            {isLocationPickerOpen && (
+              <div id="property-neighborhood-options" className="location-search-results" role="listbox">
                 {filteredNeighborhoods.map((n) => (
                   <button
                     key={n.id}
                     type="button"
+                    role="option"
+                    aria-selected={Number(base.neighborhoodId) === n.id}
                     className={Number(base.neighborhoodId) === n.id ? "location-search-results__item location-search-results__item--selected" : "location-search-results__item"}
+                    onMouseDown={(event) => event.preventDefault()}
                     onClick={() => {
                       updateBase({ neighborhoodId: String(n.id) });
                       setLocationQuery(n.name);
+                      setIsLocationPickerOpen(false);
                     }}
                   >
                     {n.name}
                   </button>
                 ))}
-                {filteredNeighborhoods.length === 0 && <p className="location-search-results__empty">محله‌ای با این نام یافت نشد.</p>}
+                {filteredNeighborhoods.length === 0 && <p className="location-search-results__empty">منطقه‌ای با این نام یافت نشد.</p>}
               </div>
             )}
-            <select value={base.neighborhoodId} onChange={(e) => updateBase({ neighborhoodId: e.target.value })} style={{ marginTop: 8 }}>
-              <option value="">انتخاب نشده</option>
-              {filteredNeighborhoods.map((n) => (
-                <option key={n.id} value={n.id}>
-                  {n.name}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 
