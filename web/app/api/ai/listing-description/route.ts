@@ -51,6 +51,8 @@ export async function POST(req: NextRequest) {
   });
   const result = await response.json().catch(() => null);
   if (!response.ok) {
+    const errorType = typeof result?.error?.type === "string" ? result.error.type : "unknown";
+    console.error("Listing description service request failed", { status: response.status, errorType });
     const error = response.status === 401 || response.status === 403
       ? "تنظیمات سرویس تولید توضیحات معتبر نیست"
       : response.status === 404
