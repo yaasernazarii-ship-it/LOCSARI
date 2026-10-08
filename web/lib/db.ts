@@ -362,6 +362,9 @@ export interface AdvertisementsTable {
   is_vip: Generated<boolean>;
   vip_expires_at: ColumnType<Date | null, string | null | undefined, string | null | undefined>;
   vip_video_url: string | null;
+  source_id: string | null;
+  source_url: string | null;
+  source_contact_phone: string | null;
   published_at: ColumnType<Date | null, string | null | undefined, string | null | undefined>;
   expires_at: ColumnType<Date | null, string | null | undefined, string | null | undefined>;
   created_at: ColumnType<Date, string | undefined, never>;
