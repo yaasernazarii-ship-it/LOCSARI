@@ -776,6 +776,30 @@ export interface ChatMessagesTable {
   created_at: ColumnType<Date, string | undefined, never>;
 }
 
+export interface ScraperImportLogsTable {
+  id: Generated<number>;
+  source_id: string | null;
+  source_url: string | null;
+  status: string;
+  advertisement_id: number | null;
+  property_id: number | null;
+  error_message: string | null;
+  created_at: ColumnType<Date, string | undefined, never>;
+}
+
+export interface ScraperRunsTable {
+  id: Generated<number>;
+  bot_name: string;
+  started_at: ColumnType<Date, string | undefined, never>;
+  finished_at: ColumnType<Date | null, string | null | undefined, string | null | undefined>;
+  scanned_count: number;
+  created_count: number;
+  updated_count: number;
+  duplicate_count: number;
+  failed_count: number;
+  error_message: string | null;
+}
+
 export interface Database {
   users: UsersTable;
   roles: RolesTable;
@@ -839,6 +863,8 @@ export interface Database {
   vip_subscriptions: VipSubscriptionsTable;
   payment_orders: PaymentOrdersTable;
   vip_ad_assignments: VipAdAssignmentsTable;
+  scraper_import_logs: ScraperImportLogsTable;
+  scraper_runs: ScraperRunsTable;
 }
 
 const pool = new Pool({
