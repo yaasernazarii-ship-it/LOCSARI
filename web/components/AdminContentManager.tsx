@@ -11,7 +11,7 @@ type Page = {
   slug: string;
   is_published: boolean;
   sort_order: number;
-  updated_at: string;
+  updated_at: string | Date;
 };
 
 type Props = { pages: Page[]; canCreate: boolean; canEdit: boolean; canDelete: boolean };
