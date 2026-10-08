@@ -413,8 +413,9 @@ export default function PropertyAdForm(props: Props) {
           monthlyRent: adForm.monthlyRent,
         }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "تولید توضیحات ناموفق بود");
+      const data = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(data?.error || "تولید توضیحات ناموفق بود");
+      if (!data?.description) throw new Error("توضیح قابل استفاده‌ای تولید نشد");
       setSuggestedDescription(data.description);
     } catch (e) {
       setError(e instanceof Error ? e.message : "تولید توضیحات ناموفق بود");

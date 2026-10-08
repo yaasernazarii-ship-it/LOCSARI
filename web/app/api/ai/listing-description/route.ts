@@ -35,24 +35,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "برای تولید توضیحات، عنوان و دسته‌بندی را وارد کنید" }, { status: 400 });
   }
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-4.1-mini",
-      max_tokens: 350,
-      messages: [
-        {
-          role: "system",
-          content: "You write concise, accurate Persian property listing descriptions. Use only the provided facts. Do not invent amenities, claims, prices, addresses, or contact information. Return only the description in Persian, between 2 and 4 short sentences.",
-        },
-        { role: "user", content: `اطلاعات آگهی:\n${JSON.stringify(details)}` },
-      ],
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4.1-mini",
+        max_tokens: 350,
+        messages: [
+          {
+            role: "system",
+            content: "You write concise, accurate Persian property listing descriptions. Use only the provided facts. Do not invent amenities, claims, prices, addresses, or contact information. Return only the description in Persian, between 2 and 4 short sentences.",
+          },
+          { role: "user", content: `اطلاعات آگهی:\n${JSON.stringify(details)}` },
+        ],
+      }),
+    });
+  } catch (error) {
+    const errorType = error instanceof Error ? error.name : "unknown";
+    console.error("Listing description service request could not be sent", { errorType });
+    return NextResponse.json({ error: "تنظیمات سرویس تولید توضیحات نامعتبر است" }, { status: 502 });
+  }
   const result = await response.json().catch(() => null);
   if (!response.ok) {
     const errorType = typeof result?.error?.type === "string" ? result.error.type : "unknown";
