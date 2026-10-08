@@ -177,19 +177,25 @@ function isDuplicateBaseField(field: CategoryField): boolean {
   return field.key === "sale_sakht" || field.key === "built_year";
 }
 
-function numericOnly(value: string): string {
-  return value.replace(/[^\d۰-۹]/g, "");
+function numericPriceOnly(value: string): string {
+  const normalized = value.replace(/[.,٫،٬]/g, "/").replace(/[^\d۰-۹/]/g, "");
+  const [integerPart, ...fractionParts] = normalized.split("/");
+  return fractionParts.length > 0 ? `${integerPart}/${fractionParts.join("")}` : integerPart;
+}
+
+function priceDisplayValue(value: unknown): string {
+  return value === null || value === undefined ? "" : numericPriceOnly(String(value));
 }
 
 function numOrNull(s: string): number | null {
   const normalized = s.trim().replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)));
   if (!normalized) return null;
 
-  const separators = [...normalized.matchAll(/[.,٫،٬]/g)];
+  const separators = [...normalized.matchAll(/[./٫،٬]/g)];
   const lastSeparator = separators.at(-1);
   const decimalIndex =
     lastSeparator && normalized.length - lastSeparator.index! - 1 <= 2 ? lastSeparator.index! : -1;
-  const integerPart = normalized.slice(0, decimalIndex === -1 ? normalized.length : decimalIndex).replace(/[.,٫،٬]/g, "");
+  const integerPart = normalized.slice(0, decimalIndex === -1 ? normalized.length : decimalIndex).replace(/[./٫،٬]/g, "");
   const fractionPart = decimalIndex === -1 ? "" : normalized.slice(decimalIndex + 1);
   if (!/^\d+$/.test(integerPart) || (fractionPart && !/^\d{1,2}$/.test(fractionPart))) return null;
 
@@ -315,9 +321,9 @@ export default function PropertyAdForm(props: Props) {
         setAdvertisementId(ad.id);
         setAdForm({
           transactionType: ad.transaction_type,
-          price: ad.price !== null ? String(ad.price) : "",
-          deposit: ad.deposit !== null ? String(ad.deposit) : "",
-          monthlyRent: ad.monthly_rent !== null ? String(ad.monthly_rent) : "",
+          price: priceDisplayValue(ad.price),
+          deposit: priceDisplayValue(ad.deposit),
+          monthlyRent: priceDisplayValue(ad.monthly_rent),
           durationDays: "",
           adType: ad.is_vip ? "vip" : "free",
           vipVideoUrl: ad.vip_video_url ?? "",
@@ -1053,12 +1059,12 @@ export default function PropertyAdForm(props: Props) {
                 <label>مبلغ رهن (تومان)</label>
                 <input
                   type="text"
-                  inputMode="numeric"
-                  pattern="[0-9۰-۹]*"
+                  inputMode="decimal"
+                  pattern="[0-9۰-۹/]*"
                   dir="ltr"
-                  placeholder="مثال: ۱۲۵۰"
+                  placeholder="مثال: ۱۲۵۰/۵۰"
                   value={adForm.deposit}
-                  onChange={(e) => setAdForm((f) => ({ ...f, deposit: numericOnly(e.target.value) }))}
+                  onChange={(e) => setAdForm((f) => ({ ...f, deposit: numericPriceOnly(e.target.value) }))}
                 />
                 {tomanInWords(adForm.deposit) && <small>{tomanInWords(adForm.deposit)}</small>}
               </div>
@@ -1066,12 +1072,12 @@ export default function PropertyAdForm(props: Props) {
                 <label>اجارهٔ ماهانه (تومان)</label>
                 <input
                   type="text"
-                  inputMode="numeric"
-                  pattern="[0-9۰-۹]*"
+                  inputMode="decimal"
+                  pattern="[0-9۰-۹/]*"
                   dir="ltr"
-                  placeholder="مثال: ۱۲۵۰"
+                  placeholder="مثال: ۱۲۵۰/۵۰"
                   value={adForm.monthlyRent}
-                  onChange={(e) => setAdForm((f) => ({ ...f, monthlyRent: numericOnly(e.target.value) }))}
+                  onChange={(e) => setAdForm((f) => ({ ...f, monthlyRent: numericPriceOnly(e.target.value) }))}
                 />
                 {tomanInWords(adForm.monthlyRent) && <small>{tomanInWords(adForm.monthlyRent)}</small>}
               </div>
@@ -1081,12 +1087,12 @@ export default function PropertyAdForm(props: Props) {
               <label>قیمت (تومان) *</label>
               <input
                 type="text"
-                inputMode="numeric"
-                pattern="[0-9۰-۹]*"
+                inputMode="decimal"
+                pattern="[0-9۰-۹/]*"
                 dir="ltr"
-                placeholder="مثال: ۱۲۵۰"
+                placeholder="مثال: ۱۲۵۰/۵۰"
                 value={adForm.price}
-                onChange={(e) => setAdForm((f) => ({ ...f, price: numericOnly(e.target.value) }))}
+                onChange={(e) => setAdForm((f) => ({ ...f, price: numericPriceOnly(e.target.value) }))}
               />
               {tomanInWords(adForm.price) && <small>{tomanInWords(adForm.price)}</small>}
             </div>
