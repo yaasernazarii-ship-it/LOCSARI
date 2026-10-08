@@ -1,0 +1,58 @@
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuth } from "@/lib/apiAuth";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+
+const MAX_FIELD_LENGTH = 500;
+
+function text(value: unknown): string {
+  return typeof value === "string" ? value.trim().slice(0, MAX_FIELD_LENGTH) : "";
+}
+
+export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth.response) return auth.response;
+  if (!checkRateLimit(`listing-description:${auth.user.id}`, 5, 10 * 60_000) || !checkRateLimit(`listing-description-ip:${getClientIp(req)}`, 20, 10 * 60_000)) {
+    return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است" }, { status: 429 });
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
+  if (!apiKey) return NextResponse.json({ error: "دستیار هوشمند هنوز پیکربندی نشده است" }, { status: 503 });
+
+  const body = await req.json().catch(() => null);
+  const details = {
+    title: text(body?.title),
+    category: text(body?.category),
+    location: text(body?.location),
+    area: text(body?.area),
+    builtArea: text(body?.builtArea),
+    bedrooms: text(body?.bedrooms),
+    builtYear: text(body?.builtYear),
+    price: text(body?.price),
+    deposit: text(body?.deposit),
+    monthlyRent: text(body?.monthlyRent),
+  };
+  if (!details.title || !details.category) {
+    return NextResponse.json({ error: "برای تولید توضیحات، عنوان و دسته‌بندی را وارد کنید" }, { status: 400 });
+  }
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 350,
+      system: "You write concise, accurate Persian property listing descriptions. Use only the provided facts. Do not invent amenities, claims, prices, addresses, or contact information. Return only the description in Persian, between 2 and 4 short sentences.",
+      messages: [{ role: "user", content: `اطلاعات آگهی:\n${JSON.stringify(details)}` }],
+    }),
+  });
+  const result = await response.json().catch(() => null);
+  if (!response.ok) return NextResponse.json({ error: "تولید توضیحات در حال حاضر ممکن نیست" }, { status: 502 });
+
+  const description = result?.content?.find((item: { type?: string }) => item.type === "text")?.text?.trim();
+  if (!description) return NextResponse.json({ error: "توضیح قابل استفاده‌ای تولید نشد" }, { status: 502 });
+  return NextResponse.json({ description });
+}

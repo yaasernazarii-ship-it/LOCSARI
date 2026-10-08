@@ -1481,6 +1481,23 @@ textarea {
   font-size: 0.8rem;
 }
 
+.ai-description-button {
+  margin-top: 10px;
+}
+
+.ai-description-suggestion {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+}
+
+.ai-description-suggestion p {
+  margin: 8px 0 12px;
+  white-space: pre-wrap;
+}
+
 .location-search-results {
   max-height: 180px;
   overflow-y: auto;

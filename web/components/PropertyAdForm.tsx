@@ -240,6 +240,8 @@ export default function PropertyAdForm(props: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [generatingDescription, setGeneratingDescription] = useState(false);
+  const [suggestedDescription, setSuggestedDescription] = useState("");
 
   // ---- انتساب مشاور (فاز ۶، بخش ۱۵) — چک‌باکس فقط برای مشاورِ approved+active نمایش داده می‌شود ----
   const [isApprovedConsultant, setIsApprovedConsultant] = useState(false);
@@ -388,6 +390,39 @@ export default function PropertyAdForm(props: Props) {
   function updateBase(patch: Partial<BaseForm>) {
     setBase((b) => ({ ...b, ...patch }));
   }
+
+  async function generateDescription() {
+    setError("");
+    setSuggestedDescription("");
+    setGeneratingDescription(true);
+    try {
+      const neighborhood = neighborhoods.find((item) => item.id === Number(base.neighborhoodId));
+      const response = await fetch("/api/ai/listing-description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: base.title,
+          category: selectedCategory?.name ?? "",
+          location: neighborhood?.name ?? "",
+          area: base.area,
+          builtArea: base.builtArea,
+          bedrooms: base.bedrooms,
+          builtYear: base.builtYear,
+          price: adForm.price,
+          deposit: adForm.deposit,
+          monthlyRent: adForm.monthlyRent,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "تولید توضیحات ناموفق بود");
+      setSuggestedDescription(data.description);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "تولید توضیحات ناموفق بود");
+    } finally {
+      setGeneratingDescription(false);
+    }
+  }
+
   function updateAttr(fieldId: number, value: AttrValue) {
     setAttrs((a) => ({ ...a, [fieldId]: value }));
   }
@@ -839,6 +874,23 @@ export default function PropertyAdForm(props: Props) {
         <div className="form-group">
           <label>توضیحات</label>
           <textarea rows={4} value={base.description} onChange={(e) => updateBase({ description: e.target.value })} />
+          <button
+            type="button"
+            className="btn-secondary ai-description-button"
+            disabled={generatingDescription || !base.title || !base.categoryId}
+            onClick={generateDescription}
+          >
+            {generatingDescription ? "در حال تولید…" : "تولید توضیحات با دستیار هوشمند"}
+          </button>
+          {suggestedDescription && (
+            <div className="ai-description-suggestion">
+              <strong>پیشنهاد دستیار هوشمند</strong>
+              <p>{suggestedDescription}</p>
+              <button type="button" className="btn-primary" onClick={() => updateBase({ description: suggestedDescription })}>
+                جایگزینی در توضیحات
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="form-grid">
