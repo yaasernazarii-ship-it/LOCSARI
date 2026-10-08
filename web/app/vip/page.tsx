@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/session";
 import { db } from "@/lib/db";
 import AdCard, { AdCardItem } from "@/components/AdCard";
 import { getSiteContent } from "@/lib/siteContent";
+import { toAparatEmbedUrl } from "@/lib/aparat";
 
 export const metadata: Metadata = {
   title: "آگهی‌های ویژه (VIP) ساری",
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 // صفحهٔ عمومی «آگهی‌های VIP» — فقط آگهی‌های منتشرشدهٔ VIP.
 export default async function VipPage() {
   const [user, content] = await Promise.all([getCurrentUser(), getSiteContent()]);
+  const heroVideoUrl = content["vip.hero.aparat_url"] ? toAparatEmbedUrl(content["vip.hero.aparat_url"]) : null;
 
   const adRows = await db
     .selectFrom("advertisements")
@@ -84,10 +86,11 @@ export default async function VipPage() {
 
   return (
     <>
-      <section className="home-hero">
+      <section className="home-hero" style={content["vip.hero.image"] ? { backgroundImage: `url("${content["vip.hero.image"]}")` } : undefined}>
         <div className="home-hero__inner">
           <h1>{content["vip.hero_title"]}</h1>
           <p>{content["vip.hero_description"]}</p>
+          {heroVideoUrl && <iframe title={`${content["vip.hero_title"]} ویدیو`} src={heroVideoUrl} allowFullScreen style={{ width: "100%", aspectRatio: "16 / 9", border: 0, marginTop: 20 }} />}
           <div className="home-hero__links">
             <Link href={user ? "/account/vip" : "/login?next=/account/vip"}>تبدیل آگهی من به VIP</Link>
           </div>

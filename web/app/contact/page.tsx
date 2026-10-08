@@ -45,6 +45,7 @@ export default async function ContactPage() {
       <h1>تماس با ما</h1>
       <div className="static-page__body">
         <p>{content["contact.intro"]}</p>
+        {content["contact.intro.image"] && <img src={content["contact.intro.image"]} alt="تماس با ما" />}
       </div>
 
       {contact?.address && (

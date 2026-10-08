@@ -39,7 +39,7 @@ export default async function CipPage() {
 
   return (
     <>
-      <section className="home-hero">
+      <section className="home-hero" style={content["cip.hero.image"] ? { backgroundImage: `url("${content["cip.hero.image"]}")` } : undefined}>
         <div className="home-hero__inner">
           <h1>{content["cip.hero_title"]}</h1>
           <p>{content["cip.hero_description"]}</p>

@@ -24,20 +24,17 @@ export const SITE_CONTENT_DEFAULTS = {
 } as const;
 
 export type SiteContentKey = keyof typeof SITE_CONTENT_DEFAULTS;
-export type SiteContent = Record<SiteContentKey, string>;
+export type SiteContent = Record<string, string>;
 
 export async function getSiteContent(): Promise<SiteContent> {
   const rows = await db
     .selectFrom("site_content_blocks")
     .select(["content_key", "value"])
-    .where("content_key", "in", Object.keys(SITE_CONTENT_DEFAULTS))
     .execute();
 
-  const content = { ...SITE_CONTENT_DEFAULTS } as SiteContent;
+  const content: SiteContent = { ...SITE_CONTENT_DEFAULTS };
   for (const row of rows) {
-    if (row.content_key in content && row.value.trim()) {
-      content[row.content_key as SiteContentKey] = row.value;
-    }
+    if (row.value.trim()) content[row.content_key] = row.value;
   }
   return content;
 }

@@ -85,7 +85,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="home-hero">
+      <section className="home-hero" style={content["home.hero.image"] ? { backgroundImage: `url("${content["home.hero.image"]}")` } : undefined}>
         <div className="home-hero__inner">
           <h1>{content["home.hero_title"]}</h1>
           <p>{content["home.hero_description"]}</p>
