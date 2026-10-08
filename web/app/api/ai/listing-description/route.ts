@@ -50,7 +50,16 @@ export async function POST(req: NextRequest) {
     }),
   });
   const result = await response.json().catch(() => null);
-  if (!response.ok) return NextResponse.json({ error: "تولید توضیحات در حال حاضر ممکن نیست" }, { status: 502 });
+  if (!response.ok) {
+    const error = response.status === 401 || response.status === 403
+      ? "تنظیمات سرویس تولید توضیحات معتبر نیست"
+      : response.status === 404
+        ? "مدل تولید توضیحات در دسترس نیست"
+        : response.status === 429
+          ? "سهمیهٔ سرویس تولید توضیحات به پایان رسیده است؛ چند دقیقهٔ دیگر دوباره تلاش کنید"
+          : "تولید توضیحات در حال حاضر ممکن نیست";
+    return NextResponse.json({ error }, { status: 502 });
+  }
 
   const description = result?.content?.find((item: { type?: string }) => item.type === "text")?.text?.trim();
   if (!description) return NextResponse.json({ error: "توضیح قابل استفاده‌ای تولید نشد" }, { status: 502 });
