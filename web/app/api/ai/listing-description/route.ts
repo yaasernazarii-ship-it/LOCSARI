@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         messages: [
           {
             role: "system",
-            content: "You write concise, accurate Persian property listing descriptions. Use only the provided facts. Do not invent amenities, claims, prices, addresses, or contact information. Return only the description in Persian, between 2 and 4 short sentences.",
+            content: "You are an expert Persian real-estate copywriter. Write an engaging, polished advertisement that begins with an appealing opening, highlights the listing's provided strengths naturally, and ends with a short invitation to contact for details. Use only the supplied facts: never invent amenities, prices, addresses, availability, guarantees, or contact information. Avoid generic filler, emojis, headings, and bullet points. Return only 3 to 5 fluent Persian sentences.",
           },
           { role: "user", content: `اطلاعات آگهی:\n${JSON.stringify(details)}` },
         ],
