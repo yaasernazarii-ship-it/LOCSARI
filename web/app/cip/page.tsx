@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check, Play, Sparkles } from "lucide-react";
 import { db } from "@/lib/db";
 import { getSiteContent } from "@/lib/siteContent";
 import { formatToman, formatPriceLine } from "@/lib/labels";
@@ -47,37 +48,34 @@ export default async function CipPage() {
       </section>
 
       {introductionVideoUrl && (
-        <section className="home-section">
-          <div className="home-section__heading"><h2>معرفی خدمات CIP</h2></div>
-          <iframe title="معرفی خدمات CIP" src={introductionVideoUrl} allowFullScreen style={{ width: "100%", aspectRatio: "16 / 9", border: 0 }} />
+        <section className="home-section cip-introduction">
+          <div className="home-section__heading"><span className="cip-eyebrow">CIP EXPERIENCE</span><h2>معرفی خدمات CIP</h2></div>
+          <div className="cip-introduction__video">
+            <iframe title="معرفی خدمات CIP" src={introductionVideoUrl} allowFullScreen />
+          </div>
         </section>
       )}
 
-      <section className="home-section">
-        <div className="home-section__heading">
+      <section className="home-section cip-showcase">
+        <div className="home-section__heading cip-showcase__heading">
+          <span className="cip-eyebrow">SELECTED PROPERTIES</span>
           <h2>{content["cip.videos_title"]}</h2>
         </div>
         {videos.length === 0 ? (
           <p className="search-empty">{content["cip.empty_message"]}</p>
         ) : (
-          <div className="result-grid">
+          <div className="cip-video-grid">
             {videos.map((video) => (
-              <Link key={video.id} href={`/agahi/${video.slug}`} className="result-card">
-                <div className="result-card__image">
+              <Link key={video.id} href={`/agahi/${video.slug}`} className="cip-video-card">
+                <div className="cip-video-card__image">
                   {video.primary_image ? <img src={video.primary_image} alt={video.title} /> : <div className="result-card__placeholder" />}
-                  <span className="result-card__vip-badge">ویدیو CIP</span>
+                  <span className="cip-video-card__badge"><Sparkles size={14} /> CIP</span>
+                  <span className="cip-video-card__play"><Play size={22} fill="currentColor" /></span>
                 </div>
-                <div className="result-card__body">
+                <div className="cip-video-card__body">
                   <h3>{video.title}</h3>
-                  <p className="result-card__price">
-                    {formatPriceLine({
-                      transactionType: video.transaction_type,
-                      price: video.price !== null ? Number(video.price) : null,
-                      deposit: video.deposit !== null ? Number(video.deposit) : null,
-                      monthlyRent: video.monthly_rent !== null ? Number(video.monthly_rent) : null,
-                    })}
-                  </p>
-                  <p className="result-card__date">ویدیوی اختصاصی CIP برای این ملک ساخته شده است.</p>
+                  <p className="cip-video-card__price">{formatPriceLine({ transactionType: video.transaction_type, price: video.price !== null ? Number(video.price) : null, deposit: video.deposit !== null ? Number(video.deposit) : null, monthlyRent: video.monthly_rent !== null ? Number(video.monthly_rent) : null })}</p>
+                  <span>تماشای ویدیوی اختصاصی</span>
                 </div>
               </Link>
             ))}
@@ -85,19 +83,21 @@ export default async function CipPage() {
         )}
       </section>
 
-      <section className="home-section">
-        <div className="home-section__heading">
+      <section className="home-section cip-plans">
+        <div className="home-section__heading cip-showcase__heading">
+          <span className="cip-eyebrow">TAILORED PRODUCTION</span>
           <h2>{content["cip.plans_title"]}</h2>
           <p>{content["cip.plans_description"]}</p>
         </div>
-        <div className="result-grid">
+        <div className="cip-plan-grid">
           {plans.map((plan) => (
-            <article key={plan.id} className="form-section">
+            <article key={plan.id} className="cip-plan-card">
+              <div className="cip-plan-card__top"><span>پلن تولید محتوا</span><Sparkles size={19} /></div>
               <h2>{plan.title}</h2>
-              {plan.description && <p>{plan.description}</p>}
-              <p style={{ fontWeight: 700 }}>{formatToman(Number(plan.price))}</p>
-              <ul>{plan.features.split("\n").filter(Boolean).map((feature) => <li key={feature}>{feature}</li>)}</ul>
-              <Link className="btn-primary" href={`/account/cip?plan=${plan.id}`}>انتخاب و ثبت درخواست</Link>
+              {plan.description && <p className="cip-plan-card__description">{plan.description}</p>}
+              <p className="cip-plan-card__price">{formatToman(Number(plan.price))}</p>
+              <ul>{plan.features.split("\n").filter(Boolean).map((feature) => <li key={feature}><Check size={17} />{feature}</li>)}</ul>
+              <Link className="cip-plan-card__action" href={`/account/cip?plan=${plan.id}`}>انتخاب این پلن <span>←</span></Link>
             </article>
           ))}
           {plans.length === 0 && <p className="search-empty">در حال حاضر پلن فعالی برای CIP وجود ندارد.</p>}
