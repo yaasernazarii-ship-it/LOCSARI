@@ -68,6 +68,19 @@ export default function SiteContentBlocksForm({ pageKeys }: { pageKeys?: string[
     (acc[block.page_key] ??= []).push(block);
     return acc;
   }, {});
+  const groupedSections = (groupKey: string, pageBlocks: Block[]) => {
+    const sections = pageBlocks.reduce<Record<string, Block[]>>((acc, block) => {
+      (acc[block.section_key] ??= []).push(block);
+      return acc;
+    }, {});
+    return Object.entries(sections).map(([sectionKey, sectionBlocks]) => [
+      sectionKey,
+      [...sectionBlocks,
+        { content_key: `${groupKey}.${sectionKey}.image`, page_key: groupKey, section_key: sectionKey, label_fa: "تصویر یا بنر بخش", value: values[`${groupKey}.${sectionKey}.image`] ?? "" },
+        { content_key: `${groupKey}.${sectionKey}.button_url`, page_key: groupKey, section_key: sectionKey, label_fa: "لینک دکمهٔ بخش", value: values[`${groupKey}.${sectionKey}.button_url`] ?? "" },
+      ],
+    ] as [string, Block[]]);
+  };
 
   return (
     <>
@@ -75,18 +88,15 @@ export default function SiteContentBlocksForm({ pageKeys }: { pageKeys?: string[
       {Object.entries(groups).map(([groupKey, pageBlocks]) => (
         <section key={groupKey} className="form-section fade-in">
           {Object.keys(groups).length > 1 && <h2>{PAGE_TITLES[groupKey] ?? groupKey}</h2>}
-          {Object.entries(
-            pageBlocks.reduce<Record<string, Block[]>>((sections, block) => {
-              (sections[block.section_key] ??= []).push(block);
-              return sections;
-            }, {})
-          ).map(([sectionKey, sectionBlocks]) => (
+          {groupedSections(groupKey, pageBlocks).map(([sectionKey, sectionBlocks]) => (
             <div key={sectionKey} className="form-section" style={{ margin: "0 0 16px", padding: 0, border: 0 }}>
               <h3>{SECTION_TITLES[sectionKey] ?? sectionKey}</h3>
               {sectionBlocks.map((block) => (
                 <div className="form-group" key={block.content_key}>
                   <label>{block.label_fa}</label>
-                  {block.value.length > 120 ? (
+                  {block.content_key.endsWith(".image") || block.content_key.endsWith(".button_url") ? (
+                    <input type="url" dir="ltr" placeholder={block.content_key.endsWith(".image") ? "https://..." : "https://..."} value={values[block.content_key] ?? ""} onChange={(e) => setValues((current) => ({ ...current, [block.content_key]: e.target.value }))} />
+                  ) : block.value.length > 120 ? (
                     <textarea rows={4} value={values[block.content_key] ?? ""} onChange={(e) => setValues((current) => ({ ...current, [block.content_key]: e.target.value }))} />
                   ) : (
                     <input type="text" value={values[block.content_key] ?? ""} onChange={(e) => setValues((current) => ({ ...current, [block.content_key]: e.target.value }))} />

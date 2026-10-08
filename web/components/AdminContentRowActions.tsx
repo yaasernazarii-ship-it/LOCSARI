@@ -28,7 +28,7 @@ export default function AdminContentRowActions({ pageId, canEdit, canDelete }: {
   return (
     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
       {canEdit && <Link href={`/admin/content/${pageId}/edit`}>ویرایش</Link>}
-      {canDelete && <ConfirmButton label="حذف" className="btn-danger admin-header-btn" disabled={loading} onConfirm={onDelete} />}
+      {canDelete && <ConfirmButton label="حذف" confirmText="آیا از حذف این صفحه مطمئن هستید؟" className="btn-danger admin-header-btn" disabled={loading} onConfirm={onDelete} />}
     </div>
   );
 }

@@ -69,7 +69,15 @@ export default function SitePageForm(props: Props) {
       .finally(() => setLoading(false));
   }, [props]);
 
-  async function onSubmit(e: React.FormEvent) {
+  function format(command: string, value?: string) {
+    document.execCommand(command, false, value);
+  }
+
+  function insertImage() {
+    const url = window.prompt("آدرس تصویر را وارد کنید");
+    if (url?.trim()) format("insertImage", url.trim());
+  }
+
     e.preventDefault();
     setSaving(true);
     setError("");
@@ -165,7 +173,17 @@ export default function SitePageForm(props: Props) {
 
         <div className="form-group">
           <label>متن صفحه *</label>
-          <textarea rows={14} value={body} onChange={(e) => setBody(e.target.value)} placeholder="متن صفحه را اینجا بنویسید..." />
+          <div className="rich-editor" dir="rtl">
+            <div className="rich-editor__toolbar" role="toolbar" aria-label="ابزارهای ویرایش متن">
+              <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => format("formatBlock", "<h2>")}>تیتر</button>
+              <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => format("bold")}>پررنگ</button>
+              <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => format("insertUnorderedList")}>فهرست</button>
+              <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => format("insertOrderedList")}>فهرست شماره‌دار</button>
+              <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={insertImage}>افزودن تصویر</button>
+            </div>
+            <div className="rich-editor__content" contentEditable suppressContentEditableWarning dangerouslySetInnerHTML={{ __html: body }} onInput={(event) => setBody(event.currentTarget.innerHTML)} />
+          </div>
+          <small>می‌توانید تیتر، متن پررنگ، فهرست و تصویر به متن صفحه اضافه کنید.</small>
         </div>
 
         <div className="form-group">

@@ -2268,6 +2268,150 @@ textarea {
   padding: 9px 18px;
 }
 
+.content-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  margin: 8px 0 22px;
+}
+
+.content-tabs__tab {
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 12px 18px;
+}
+
+.content-tabs__tab--active {
+  border-bottom-color: #0145c9;
+  color: #0145c9;
+}
+
+.admin-table-toolbar,
+.admin-pagination {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  margin: 0 0 12px;
+}
+
+.admin-table-toolbar input {
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  font: inherit;
+  max-width: 420px;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+.admin-table-toolbar span,
+.admin-pagination span {
+  color: #64748b;
+  font-size: .85rem;
+}
+
+.admin-pagination {
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.admin-pagination button {
+  background: #fff;
+  border: 1px solid #dbe3ef;
+  border-radius: 7px;
+  color: #0145c9;
+  cursor: pointer;
+  font: inherit;
+  padding: 7px 14px;
+}
+
+.admin-pagination button:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.content-preview-link {
+  display: inline-block;
+  font-size: 1rem;
+  margin-right: 6px;
+}
+
+.rich-editor {
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.rich-editor__toolbar {
+  align-items: center;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+}
+
+.rich-editor__toolbar button {
+  background: #fff;
+  border: 1px solid #dbe3ef;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  padding: 5px 9px;
+}
+
+.rich-editor__content {
+  background: #fff;
+  min-height: 280px;
+  outline: 0;
+  padding: 14px;
+}
+
+.rich-editor__content:empty::before {
+  color: #94a3b8;
+  content: "متن صفحه را اینجا بنویسید...";
+}
+
+.rich-editor__content img {
+  display: block;
+  max-width: 100%;
+}
+
+.confirm-dialog-backdrop {
+  align-items: center;
+  background: rgba(15, 23, 42, .42);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 1000;
+}
+
+.confirm-dialog {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 15px 45px rgba(15, 23, 42, .22);
+  max-width: 420px;
+  padding: 24px;
+  text-align: center;
+  width: calc(100% - 32px);
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+
+
 .admin-history-list {
   list-style: none;
   margin: 0;
