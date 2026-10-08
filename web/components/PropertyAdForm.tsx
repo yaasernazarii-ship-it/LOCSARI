@@ -51,6 +51,23 @@ function threeDigitWords(value: number): string {
   }
   return parts.join(" و ");
 }
+function measurementInWords(raw: string): string {
+  const value = numOrNull(raw);
+  if (value === null || value < 0) return "";
+  const [integer, fraction] = value.toFixed(2).replace(/0+$/, "").replace(/\.$/, "").split(".");
+  let n = Number(integer);
+  const parts: string[] = [];
+  let scale = 0;
+  while (n > 0) {
+    const group = n % 1000;
+    if (group) parts.unshift(`${threeDigitWords(group)}${PERSIAN_SCALES[scale] ? ` ${PERSIAN_SCALES[scale]}` : ""}`);
+    n = Math.floor(n / 1000);
+    scale++;
+  }
+  const result = parts.join(" و ") || "صفر";
+  return fraction ? `${result} ممیز ${threeDigitWords(Number(fraction))}` : result;
+}
+
 function tomanInWords(raw: string): string {
   const value = numOrNull(raw);
   if (value === null || value < 0) return "";
@@ -812,10 +829,12 @@ export default function PropertyAdForm(props: Props) {
           <div className="form-group">
             <label>متراژ (متر مربع)</label>
             <input type="number" min={0} value={base.area} onChange={(e) => updateBase({ area: e.target.value })} />
+            {measurementInWords(base.area) && <small className="number-in-words">{measurementInWords(base.area)} متر مربع</small>}
           </div>
           <div className="form-group">
             <label>زیربنا (متر مربع)</label>
             <input type="number" min={0} value={base.builtArea} onChange={(e) => updateBase({ builtArea: e.target.value })} />
+            {measurementInWords(base.builtArea) && <small className="number-in-words">{measurementInWords(base.builtArea)} متر مربع</small>}
           </div>
           <div className="form-group">
             <label>تعداد اتاق خواب</label>

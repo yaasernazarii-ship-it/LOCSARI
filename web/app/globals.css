@@ -1474,6 +1474,13 @@ textarea {
   margin: -4px 0 14px;
 }
 
+.number-in-words {
+  display: block;
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
 .location-search-results {
   max-height: 180px;
   overflow-y: auto;
