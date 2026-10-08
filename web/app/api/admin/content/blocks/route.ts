@@ -27,7 +27,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   const allowed = Object.keys(SITE_CONTENT_DEFAULTS) as SiteContentKey[];
-  const isAllowedKey = (key: string) => allowed.includes(key as SiteContentKey) || /^[a-z0-9_-]+\.[a-z0-9_-]+\.(image|video|button_url)$/.test(key);
+  const isAllowedKey = (key: string) => allowed.includes(key as SiteContentKey) || /^[a-z0-9_-]+\.[a-z0-9_-]+\.(image|aparat_url|button_url)$/.test(key);
   const updates = Object.entries(values).filter(
     ([key, value]) => isAllowedKey(key) && typeof value === "string" && value.length <= 5000
   ) as [SiteContentKey, string][];
