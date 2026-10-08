@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { showToast } from "@/lib/adminToast";
 
 type Block = { content_key: string; page_key: string; section_key: string; label_fa: string; value: string };
@@ -28,22 +28,28 @@ export default function SiteContentBlocksForm({ pageKeys }: { pageKeys?: string[
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [values, setValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const loadedScope = useRef<string | null>(null);
+  const contentScope = pageKeys?.join("|") ?? "all";
   const [saving, setSaving] = useState(false);
   const [uploadingKey, setUploadingKey] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (loadedScope.current === contentScope) return;
+    loadedScope.current = contentScope;
+    setLoading(true);
     fetch("/api/admin/content/blocks")
       .then(async (res) => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "خطا در بارگذاری محتوا");
-        const filtered = pageKeys ? data.blocks.filter((b: Block) => pageKeys.includes(b.page_key)) : data.blocks;
+        const selectedPageKeys = contentScope === "all" ? null : contentScope.split("|");
+        const filtered = selectedPageKeys ? data.blocks.filter((b: Block) => selectedPageKeys.includes(b.page_key)) : data.blocks;
         setBlocks(filtered);
         setValues(Object.fromEntries(filtered.map((block: Block) => [block.content_key, block.value])));
       })
       .catch((err) => setError(err instanceof Error ? err.message : "خطا در بارگذاری محتوا"))
       .finally(() => setLoading(false));
-  }, [pageKeys]);
+  }, [contentScope]);
 
   async function uploadMedia(contentKey: string, file: File) {
     setUploadingKey(contentKey);
