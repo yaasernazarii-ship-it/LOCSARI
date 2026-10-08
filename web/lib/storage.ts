@@ -81,4 +81,3 @@ export const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // ۱۰ مگابایت
 export const MAX_VIDEO_SIZE_BYTES = 30 * 1024 * 1024; // ۳۰ مگابایت
 export const MAX_MEDIA_PER_PROPERTY = 20;
 export const MAX_VIDEO_PER_PROPERTY = 3;
-export const MIN_PROPERTY_IMAGES = 3;

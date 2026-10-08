@@ -21,7 +21,6 @@ const CATEGORY_TRANSACTION_TYPES: Record<string, TransactionType> = {
   "pishforosh-mosharekat-sakht": "pre_sale",
   "saeer-amlak": "sale",
 };
-const MIN_PROPERTY_IMAGES = 3;
 const MAX_PROPERTY_IMAGES = 20;
 const CURRENT_PERSIAN_YEAR = Number(
   new Intl.DateTimeFormat("en-US-u-ca-persian", { year: "numeric" }).formatToParts(new Date()).find((part) => part.type === "year")?.value
@@ -516,9 +515,6 @@ export default function PropertyAdForm(props: Props) {
       resolvedPropertyId = createdPropertyId;
     }
     if (selectedFiles.length > 0 && !(await uploadFilesDirect(selectedFiles, resolvedPropertyId))) return;
-    if (media.filter((m) => !isVideoMime(m.mimeType)).length + selectedFiles.length < MIN_PROPERTY_IMAGES) {
-      return setError(`حداقل ${MIN_PROPERTY_IMAGES} عکس برای ثبت آگهی لازم است.`);
-    }
     if (!categoryTransactionType) return setError("نوع معامله برای دسته‌بندی انتخاب‌شده مشخص نیست");
     const transactionType = categoryTransactionType;
     setSaving(true);
@@ -650,11 +646,6 @@ export default function PropertyAdForm(props: Props) {
     if (!advertisementId) return;
     setError("");
     setNotice("");
-    const imageCount = media.filter((m) => !isVideoMime(m.mimeType)).length;
-    if (imageCount < MIN_PROPERTY_IMAGES) {
-      setError(`برای ارسال به بررسی و انتشار، حداقل ${MIN_PROPERTY_IMAGES} عکس برای ملک لازم است.`);
-      return;
-    }
     const res = await fetch(`/api/advertisements/${advertisementId}/submit`, { method: "POST" });
     const data = await res.json();
     if (!res.ok) {
@@ -892,20 +883,13 @@ export default function PropertyAdForm(props: Props) {
   }
 
   function renderMediaSection() {
-    const imageCount = media.filter((m) => !isVideoMime(m.mimeType)).length;
     return (
       <div className="form-section">
         <h2>تصاویر ملک</h2>
         <p className="form-hint">
-          تصویر: jpg، png، webp (حداکثر ۱۰ مگابایت) — حداکثر ۲۰ عکس. افزودن ویدیو فقط برای آگهی‌های VIP و از طریق پنل مدیریت (لینک
+          تصویر: jpg، png، webp (حداکثر ۱۰ مگابایت) — از صفر تا حداکثر ۲۰ عکس. افزودن ویدیو فقط برای آگهی‌های VIP و از طریق پنل مدیریت (لینک
           آپارات) انجام می‌شود.
         </p>
-        {imageCount < MIN_PROPERTY_IMAGES && (
-          <p className="form-hint form-hint--warning">
-            برای ارسال آگهی به بررسی و انتشار آن، افزودن حداقل {MIN_PROPERTY_IMAGES} عکس الزامی است ({imageCount.toLocaleString("fa-IR")} عکس
-            اضافه‌شده).
-          </p>
-        )}
         {media.length > 0 && (
           <div className="media-grid">
             {media.map((m) => (
