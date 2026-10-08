@@ -38,6 +38,8 @@ export async function POST(req: NextRequest) {
   const token = authorization.startsWith("Bearer ") ? authorization.slice(7).trim() : req.headers.get("x-api-key")?.trim() ?? "";
   if (!secret || !token || !sameSecret(token, secret)) return NextResponse.json({ error: "دسترسی نامعتبر است" }, { status: 401 });
   if (!Number.isInteger(ownerId) || ownerId <= 0) return NextResponse.json({ error: "حساب واردکننده پیکربندی نشده است" }, { status: 503 });
+  const owner = await db.selectFrom("users").select("id").where("id", "=", ownerId).executeTakeFirst();
+  if (!owner) return NextResponse.json({ error: "شناسه کاربر واردکننده در سامانه وجود ندارد" }, { status: 422 });
   if (!checkRateLimit(`property-import:${getClientIp(req)}`)) return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است" }, { status: 429 });
 
   const body = await req.json().catch(() => null) as Record<string, unknown> | null;
