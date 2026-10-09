@@ -248,17 +248,21 @@ def collect_source(name, listing_url, limit, user_agent, retries, min_delay, max
     listing_html = fetch(listing_url, user_agent, retries, min_delay, max_delay)
     urls = divar_urls(listing_html) if name == "divar" else sheypoor_urls(listing_html)
     if not urls and name == "divar" and re.search(r"captcha|blocked|دسترسی", listing_html, re.I):
-        raise RuntimeError("divar: پاسخ ضدربات یا کپچا دریافت شد؛ اسکن متوقف شد")
+        print("divar: پاسخ ضدربات یا کپچا دریافت شد؛ این منبع رد شد", file=sys.stderr)
+        return []
     items = []
     for url in urls[:limit]:
-        source_id = f"{name}_{re.search(r'([A-Za-z0-9]+)(?:\.html)?$', url).group(1)}" if name == "divar" else f"{name}_{re.search(r'-(\d+)\.html$', url).group(1)}"
-        canonical_url = request_url(url)
-        detail_html = fetch(canonical_url, user_agent, retries, min_delay, max_delay)
-        item = structured_item(parse_page(detail_html), canonical_url, source_id, name)
-        item.pop("source_name", None)
-        items.append(item)
-    if len(items) < limit:
-        raise RuntimeError(f"{name}: فقط {len(items)} آگهی قابل استخراج شد؛ انتظار {limit} آگهی بود")
+        try:
+            source_id = f"{name}_{re.search(r'([A-Za-z0-9]+)(?:\.html)?$', url).group(1)}" if name == "divar" else f"{name}_{re.search(r'-(\d+)\.html$', url).group(1)}"
+            canonical_url = request_url(url)
+            detail_html = fetch(canonical_url, user_agent, retries, min_delay, max_delay)
+            item = structured_item(parse_page(detail_html), canonical_url, source_id, name)
+            item.pop("source_name", None)
+            items.append(item)
+        except (HTTPError, URLError, IncompleteRead, ValueError, AttributeError) as error:
+            print(json.dumps({"source": name, "url": url, "error": str(error)}, ensure_ascii=False), file=sys.stderr)
+    if not items:
+        print(f"{name}: آگهی قابل استخراجی پیدا نشد", file=sys.stderr)
     return items
 
 
@@ -288,11 +292,12 @@ def import_item(endpoint, api_key, item, retries):
 def main():
     parser = argparse.ArgumentParser(description="استخراج پنج آگهی املاک ساری از دیوار و شیپور")
     parser.add_argument("--endpoint", default=os.getenv("PROPERTY_IMPORT_ENDPOINT", DEFAULT_ENDPOINT))
+    parser.add_argument("--source", choices=("all", "divar", "sheypoor"), default="all")
     parser.add_argument("--divar-limit", type=int, default=3)
     parser.add_argument("--sheypoor-limit", type=int, default=2)
     parser.add_argument("--retries", type=int, default=3)
-    parser.add_argument("--min-delay", type=float, default=3)
-    parser.add_argument("--max-delay", type=float, default=7)
+    parser.add_argument("--min-delay", type=float, default=10)
+    parser.add_argument("--max-delay", type=float, default=15)
     parser.add_argument("--user-agent", default=os.getenv("PROPERTY_SCRAPER_USER_AGENT", DEFAULT_USER_AGENT))
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
@@ -300,8 +305,11 @@ def main():
         parser.error("بازهٔ تأخیر نامعتبر است")
 
     try:
-        items = collect_source("divar", DIVAR_URL, args.divar_limit, args.user_agent, args.retries, args.min_delay, args.max_delay)
-        items.extend(collect_source("sheypoor", SHEYPOOR_URL, args.sheypoor_limit, args.user_agent, args.retries, args.min_delay, args.max_delay))
+        items = []
+        if args.source in ("all", "divar"):
+            items.extend(collect_source("divar", DIVAR_URL, args.divar_limit, args.user_agent, args.retries, args.min_delay, args.max_delay))
+        if args.source in ("all", "sheypoor"):
+            items.extend(collect_source("sheypoor", SHEYPOOR_URL, args.sheypoor_limit, args.user_agent, args.retries, args.min_delay, args.max_delay))
     except (HTTPError, URLError, IncompleteRead, ValueError, RuntimeError) as error:
         print(json.dumps({"error": str(error)}, ensure_ascii=False), file=sys.stderr)
         return 2
