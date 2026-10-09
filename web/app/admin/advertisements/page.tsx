@@ -70,7 +70,7 @@ export default async function AdminAdvertisementsPage({ searchParams }: { search
       }
     }
     if (ownerQ) {
-      query = query.where((eb) => eb.or([eb("users.name", "ilike", `%${ownerQ}%`), eb("users.phone", "ilike", `%${ownerQ}%`)]));
+      query = query.where((eb) => eb.or([eb("users.name", "ilike", `%${ownerQ}%`), eb("users.phone", "ilike", `%${ownerQ}%`), eb("advertisements.source_contact_phone", "ilike", `%${ownerQ}%`)]));
     }
     if (q) {
       const numericId = /^\d+$/.test(q) ? Number(q) : null;
@@ -118,7 +118,7 @@ export default async function AdminAdvertisementsPage({ searchParams }: { search
         "categories.name as category_name",
         "cities.name as city_name",
         "users.name as owner_name",
-        "users.phone as owner_phone",
+        sql<string>`coalesce(nullif(advertisements.source_contact_phone, ''), users.phone)`.as("owner_phone"),
         "consultants.display_name as consultant_name",
         "agencies.name as agency_name",
         sql<"user" | "consultant" | "agency">`case when advertisements.agency_id is not null then 'agency' when advertisements.consultant_id is not null then 'consultant' else 'user' end`.as("owner_account_type"),

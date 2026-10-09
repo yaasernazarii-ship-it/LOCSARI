@@ -71,6 +71,7 @@ export default async function AdminAdvertisementDetailPage({ params }: { params:
       "users.id as owner_id",
       "users.name as owner_name",
       "users.phone as owner_phone",
+      "advertisements.source_contact_phone",
       "consultants.id as consultant_id",
       "consultants.display_name as consultant_name",
       "consultants.slug as consultant_slug",
@@ -312,7 +313,8 @@ export default async function AdminAdvertisementDetailPage({ params }: { params:
           <section className="form-section">
             <h2>مالک آگهی</h2>
             <p>{ad.owner_name}</p>
-            <p style={{ color: "#666" }}>{ad.owner_phone}</p>
+            <p style={{ color: "#666" }}>{ad.source_contact_phone ?? ad.owner_phone}</p>
+            {ad.source_contact_phone && <small style={{ color: "#666" }}>شمارهٔ تماس اعلام‌شده در آگهی منبع</small>}
             <Link href={`/admin/users/${ad.owner_id}`}>مشاهدهٔ کاربر</Link>
           </section>
 

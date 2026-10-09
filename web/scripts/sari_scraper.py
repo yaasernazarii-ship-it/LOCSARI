@@ -162,6 +162,28 @@ def infer_property_type(text):
     return "apartment"
 
 
+def normalize_phone(value):
+    digits = normalize_digits(value).replace(" ", "").replace("-", "")
+    if digits.startswith("+98"):
+        digits = "0" + digits[3:]
+    elif digits.startswith("0098"):
+        digits = "0" + digits[4:]
+    return digits if re.fullmatch(r"09\d{9}", digits) else None
+
+
+def extract_public_contact_phone(html):
+    consultant = re.search(r'"consultant"\s*:\s*\{[^{}]{0,2000}?"slug"\s*:\s*"([^"\\]+)"', html)
+    if consultant:
+        phone = normalize_phone(consultant.group(1))
+        if phone:
+            return phone
+    for candidate in re.findall(r'(?<!\d)(?:\+98|0098|0)?9\d{9}(?!\d)', normalize_digits(html)):
+        phone = normalize_phone(candidate)
+        if phone:
+            return phone
+    return None
+
+
 def structured_item(parser, source_url, source_id, source_name):
     objects = list(flatten_json(parser.json_ld))
     target_objects = [obj for obj in objects if isinstance(obj.get("url"), str) and request_url(obj["url"]) == source_url]
@@ -257,6 +279,9 @@ def collect_source(name, listing_url, limit, user_agent, retries, min_delay, max
             canonical_url = request_url(url)
             detail_html = fetch(canonical_url, user_agent, retries, min_delay, max_delay)
             item = structured_item(parse_page(detail_html), canonical_url, source_id, name)
+            contact_phone = extract_public_contact_phone(detail_html)
+            if contact_phone:
+                item["contact_phone"] = contact_phone
             item.pop("source_name", None)
             items.append(item)
         except (HTTPError, URLError, IncompleteRead, ValueError, AttributeError) as error:
