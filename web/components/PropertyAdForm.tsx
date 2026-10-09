@@ -4,7 +4,7 @@
 // properties POST/PATCH، advertisements POST/PATCH، properties/:id/media، categories/:id/fields.
 // حالت create: ویزارد سه‌مرحله‌ای (ملک -> تصاویر -> آگهی). حالت edit: همهٔ بخش‌ها در یک صفحه.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { TRANSACTION_TYPE_LABELS, RENT_BASED_TRANSACTION_TYPES, ADVERTISEMENT_STATUS_LABELS } from "@/lib/labels";
 import { TransactionType } from "@/lib/validation";
@@ -230,6 +230,7 @@ export default function PropertyAdForm(props: Props) {
   const [adForm, setAdForm] = useState<AdInfoForm>(emptyAdForm());
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
   const [propertyId, setPropertyId] = useState<number | null>(null);
@@ -613,6 +614,7 @@ export default function PropertyAdForm(props: Props) {
       setAdvertisementId(data.advertisement.id);
       setAdStatus(data.advertisement.status);
       setSelectedFiles([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
       if (adForm.adType === "vip") {
         const vipError = await applyVipSelection(data.advertisement.id, true);
         if (vipError) setNotice(`آگهی ثبت شد، اما فعال‌سازی VIP ناموفق بود: ${vipError}`);
@@ -1022,6 +1024,7 @@ export default function PropertyAdForm(props: Props) {
             {uploading ? "در حال آپلود…" : "انتخاب عکس‌ها"}
           </label>
           <input
+            ref={fileInputRef}
             id="property-images"
             type="file"
             multiple
@@ -1030,9 +1033,9 @@ export default function PropertyAdForm(props: Props) {
             style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
             onChange={(e) => {
               if (e.target.files && e.target.files.length > 0) uploadFilesDirect(e.target.files);
-              e.target.value = "";
             }}
           />
+          {selectedFiles.length > 0 && <p className="form-hint">{selectedFiles.length.toLocaleString("fa-IR")} عکس برای بارگذاری انتخاب شده است.</p>}
           <p className="form-hint">برای ثبت آگهی جدید، عکس‌ها انتخاب می‌شوند و پس از ثبت ملک به‌صورت خودکار بارگذاری خواهند شد.</p>
         </div>
       </div>
