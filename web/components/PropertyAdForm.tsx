@@ -1018,17 +1018,22 @@ export default function PropertyAdForm(props: Props) {
           </div>
         )}
         <div className="form-group">
+          <label htmlFor="property-images" className="btn-secondary" style={{ display: "inline-flex", width: "fit-content", cursor: uploading ? "wait" : "pointer" }}>
+            {uploading ? "در حال آپلود…" : "انتخاب عکس‌ها"}
+          </label>
           <input
+            id="property-images"
             type="file"
             multiple
             accept="image/jpeg,image/png,image/webp"
             disabled={uploading}
+            style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
             onChange={(e) => {
               if (e.target.files && e.target.files.length > 0) uploadFilesDirect(e.target.files);
               e.target.value = "";
             }}
           />
-          {uploading && <p className="form-hint">در حال آپلود…</p>}
+          <p className="form-hint">برای ثبت آگهی جدید، عکس‌ها انتخاب می‌شوند و پس از ثبت ملک به‌صورت خودکار بارگذاری خواهند شد.</p>
         </div>
       </div>
     );
