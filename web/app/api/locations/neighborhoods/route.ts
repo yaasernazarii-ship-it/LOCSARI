@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
       "seo_description",
     ])
     .where("is_active", "=", true)
-    .orderBy("sort_order", "asc");
+    .orderBy("name", "asc");
 
   if (cityId !== undefined) query = query.where("city_id", "=", cityId);
   if (districtId !== undefined) query = query.where("district_id", "=", districtId);

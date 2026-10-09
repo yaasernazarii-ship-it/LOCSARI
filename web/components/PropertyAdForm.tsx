@@ -289,7 +289,7 @@ export default function PropertyAdForm(props: Props) {
         setCityId(sari.id);
         fetch(`/api/locations/neighborhoods?cityId=${sari.id}`, { cache: "no-store" })
           .then((r) => r.json())
-          .then((dd) => setNeighborhoods(dd.neighborhoods ?? []))
+          .then((dd) => setNeighborhoods([...(dd.neighborhoods ?? [])].sort((a, b) => a.name.localeCompare(b.name, "fa"))))
           .catch(() => {});
       })
       .catch(() => {});
