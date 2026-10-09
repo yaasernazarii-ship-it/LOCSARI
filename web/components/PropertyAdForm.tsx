@@ -395,6 +395,10 @@ export default function PropertyAdForm(props: Props) {
   async function generateDescription() {
     setError("");
     setSuggestedDescription("");
+    if (!base.title.trim() || !base.categoryId) {
+      setError("برای تولید توضیحات، عنوان و دسته‌بندی را وارد کنید.");
+      return;
+    }
     setGeneratingDescription(true);
     try {
       const neighborhood = neighborhoods.find((item) => item.id === Number(base.neighborhoodId));
@@ -961,7 +965,7 @@ export default function PropertyAdForm(props: Props) {
           <button
             type="button"
             className="btn-secondary ai-description-button"
-            disabled={generatingDescription || !base.title || !base.categoryId}
+            disabled={generatingDescription}
             onClick={generateDescription}
           >
             {generatingDescription ? "در حال تولید…" : "تولید توضیحات با دستیار هوشمند"}
