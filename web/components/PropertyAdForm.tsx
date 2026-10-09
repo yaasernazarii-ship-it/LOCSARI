@@ -875,28 +875,6 @@ export default function PropertyAdForm(props: Props) {
           <label>عنوان آگهی *</label>
           <input type="text" value={base.title} onChange={(e) => updateBase({ title: e.target.value })} maxLength={200} />
         </div>
-        <div className="form-group">
-          <label>توضیحات</label>
-          <textarea rows={4} value={base.description} onChange={(e) => updateBase({ description: e.target.value })} />
-          <button
-            type="button"
-            className="btn-secondary ai-description-button"
-            disabled={generatingDescription || !base.title || !base.categoryId}
-            onClick={generateDescription}
-          >
-            {generatingDescription ? "در حال تولید…" : "تولید توضیحات با دستیار هوشمند"}
-          </button>
-          {suggestedDescription && (
-            <div className="ai-description-suggestion">
-              <strong>پیشنهاد دستیار هوشمند</strong>
-              <p>{suggestedDescription}</p>
-              <button type="button" className="btn-primary" onClick={() => updateBase({ description: suggestedDescription })}>
-                جایگزینی در توضیحات
-              </button>
-            </div>
-          )}
-        </div>
-
         <div className="form-grid">
           <div className="form-group">
             <label>متراژ (متر مربع)</label>
@@ -969,6 +947,35 @@ export default function PropertyAdForm(props: Props) {
             </div>
           </>
         )}
+      </div>
+    );
+  }
+
+  function renderDescriptionSection() {
+    return (
+      <div className="form-section">
+        <h2>توضیحات آگهی</h2>
+        <div className="form-group">
+          <label>توضیحات</label>
+          <textarea rows={4} value={base.description} onChange={(e) => updateBase({ description: e.target.value })} />
+          <button
+            type="button"
+            className="btn-secondary ai-description-button"
+            disabled={generatingDescription || !base.title || !base.categoryId}
+            onClick={generateDescription}
+          >
+            {generatingDescription ? "در حال تولید…" : "تولید توضیحات با دستیار هوشمند"}
+          </button>
+          {suggestedDescription && (
+            <div className="ai-description-suggestion">
+              <strong>پیشنهاد دستیار هوشمند</strong>
+              <p>{suggestedDescription}</p>
+              <button type="button" className="btn-primary" onClick={() => updateBase({ description: suggestedDescription })}>
+                جایگزینی در توضیحات
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -1189,6 +1196,7 @@ export default function PropertyAdForm(props: Props) {
           {renderPropertySection()}
           {renderMediaSection()}
           {renderAdInfoSection()}
+          {renderDescriptionSection()}
           <div className="form-actions">
             <button type="button" className="btn-primary" onClick={submitStep3} disabled={saving || uploading || adStatus === "pending_review"}>
               {saving ? "در حال ثبت…" : adStatus === "pending_review" ? "آگهی برای بررسی ارسال شد" : "ثبت و ارسال برای بررسی"}
@@ -1212,6 +1220,7 @@ export default function PropertyAdForm(props: Props) {
           {renderPropertySection()}
           {renderMediaSection()}
           {renderAdInfoSection()}
+          {renderDescriptionSection()}
           <div className="form-actions">
             <button type="button" className="btn-primary" onClick={saveEdits} disabled={saving}>
               {saving ? "در حال ذخیره…" : "ذخیرهٔ تغییرات"}
