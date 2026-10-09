@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   const images = Array.isArray(body.images) ? body.images.filter((item): item is string => typeof item === "string" && /^https?:\/\//.test(item) && item.length <= 2000).slice(0, 20) : [];
   const description = text(body.description, 10000);
   const sourceUrl = text(body.source_url, 2000);
-  const status = body.status === "pending_review" ? "pending_review" : "published";
+  const status = "published";
   const now = new Date().toISOString();
 
   const existing = await db.selectFrom("advertisements").select(["id", "property_id"]).where("source_id", "=", sourceId).executeTakeFirst();
