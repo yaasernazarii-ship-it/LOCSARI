@@ -51,8 +51,8 @@ export async function searchPropertyQuery(query: PropertyQuery) {
     .where("properties.is_active", "=", true);
   if (query.dealType) builder = builder.where("advertisements.transaction_type", "=", query.dealType);
   if (query.neighborhoodId) builder = builder.where("properties.neighborhood_id", "=", query.neighborhoodId);
-  if (query.maxPrice !== null) builder = builder.where("advertisements.price", "<=", query.maxPrice);
-  if (query.minArea !== null) builder = builder.where("properties.area", "=", query.minArea);
+  if (query.maxPrice !== null) builder = builder.where("advertisements.price", "<=", String(query.maxPrice));
+  if (query.minArea !== null) builder = builder.where("properties.area", "=", String(query.minArea));
   if (query.propertyType) {
     const slug = query.propertyType === "villa" ? "%vila%" : query.propertyType === "land" ? "%zamin%" : "%apartman%";
     builder = builder.where("categories.slug", "like", slug);
