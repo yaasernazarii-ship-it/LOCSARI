@@ -3198,8 +3198,11 @@ a.contact-info-card:hover {
 
 .property-assistant { grid-column: 1 / -1; padding: 20px; border: 1px solid #bfdbfe; border-radius: 16px; background: #f8fbff; }
 .property-assistant h2 { margin: 0 0 14px; color: #0f3f8f; font-size: 1.2rem; }
+.property-assistant h2 span { display: block; margin-top: 4px; color: #4b5563; font-size: .9rem; font-weight: 500; }
 .property-assistant__form { display: flex; gap: 10px; align-items: center; }
 .property-assistant__form input { flex: 1; min-width: 0; }
+.property-assistant__form > .btn-primary,
+.property-assistant__form > .btn-secondary { flex: 0 0 auto; width: auto; padding-inline: 24px; }
 .property-assistant__alert { margin-top: 12px; }
 .property-assistant__alert label { display: block; margin-bottom: 10px; }
 .property-assistant__results { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 14px; }

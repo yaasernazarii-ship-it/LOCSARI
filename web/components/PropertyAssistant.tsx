@@ -15,6 +15,11 @@ export default function PropertyAssistant() {
   const [loading, setLoading] = useState(false);
 
   async function submit(subscribe = false) {
+    if (!query.trim()) {
+      setMessage("خلاصه‌ای از ملک موردنیازتان را بنویسید.");
+      return;
+    }
+
     setLoading(true); setMessage("");
     try {
       const response = await fetch("/api/property-assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query, phone: phone || undefined, name: name || undefined, subscribe }) });
@@ -29,10 +34,10 @@ export default function PropertyAssistant() {
   }
 
   return <section className="property-assistant">
-    <h2>دنبال چه ملکی در ساری هستید؟ (تایپ کنید)</h2>
+    <h2>دستیار نیازسنجی هوشمند شما <span>(خلاصه‌ای از ملکی که نیاز داری بنویس)</span></h2>
     <div className="property-assistant__form">
-      <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="مثلاً آپارتمان ۲ خوابه حوالی طالقانی تا ۴ میلیارد خرید" />
-      <button type="button" className="btn-primary" disabled={loading || !query.trim()} onClick={() => submit()}> {loading ? "در حال جست‌وجو…" : "جست‌وجو"} </button>
+      <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="مثلاً آپارتمان ۲ خوابه حوالی طالقانی تا ۴ میلیارد برای خرید" />
+      <button type="button" className="btn-primary" disabled={loading} onClick={() => submit()}> {loading ? "در حال جست‌وجو…" : "جست‌وجو"} </button>
     </div>
     {(needsPhone || results.length > 0) && <div className="property-assistant__alert">
       <label><input type="checkbox" checked={needsPhone} onChange={(event) => setNeedsPhone(event.target.checked)} /> آگهی‌های جدید این منطقه را به من پیامک کن</label>
