@@ -2,6 +2,7 @@ import { timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { notifyPropertyAlerts } from "@/lib/propertyAlertNotifier";
 
 const CATEGORY_SLUGS: Record<string, Record<string, string>> = {
   sale: { apartment: "kharid-forosh-khane-apartman", villa: "kharid-forosh-vila", land: "zamin-bagh", commercial: "kharid-forosh-edari-tejari-sanati" },
@@ -85,5 +86,6 @@ export async function POST(req: NextRequest) {
     return { propertyId: property.id, advertisementId: ad.id };
   });
   await logImport({ sourceId, sourceUrl, status: "created", advertisementId: result.advertisementId, propertyId: result.propertyId });
+  await notifyPropertyAlerts(result.advertisementId, result.propertyId);
   return NextResponse.json({ id: result.propertyId, advertisementId: result.advertisementId, created: true }, { status: 201 });
 }

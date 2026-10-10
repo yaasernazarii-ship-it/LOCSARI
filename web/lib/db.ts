@@ -787,6 +787,32 @@ export interface ScraperImportLogsTable {
   created_at: ColumnType<Date, string | undefined, never>;
 }
 
+export interface PropertyAlertsTable {
+  id: Generated<number>;
+  phone: string;
+  query_text: string;
+  deal_type: string | null;
+  property_type: string | null;
+  neighborhood_id: number | null;
+  min_price: ColumnType<string | null, number | string | null, number | string | null>;
+  max_price: ColumnType<string | null, number | string | null, number | string | null>;
+  min_area: ColumnType<string | null, number | string | null, number | string | null>;
+  max_area: ColumnType<string | null, number | string | null, number | string | null>;
+  is_active: Generated<boolean>;
+  last_notified_advertisement_id: number | null;
+  created_at: ColumnType<Date, string | undefined, never>;
+  updated_at: ColumnType<Date, string | undefined, string | undefined>;
+}
+
+export interface PropertyAlertDeliveriesTable {
+  id: Generated<number>;
+  property_alert_id: number;
+  advertisement_id: number;
+  status: string;
+  error_message: string | null;
+  created_at: ColumnType<Date, string | undefined, never>;
+}
+
 export interface ScraperRunsTable {
   id: Generated<number>;
   bot_name: string;
@@ -864,6 +890,8 @@ export interface Database {
   payment_orders: PaymentOrdersTable;
   vip_ad_assignments: VipAdAssignmentsTable;
   scraper_import_logs: ScraperImportLogsTable;
+  property_alerts: PropertyAlertsTable;
+  property_alert_deliveries: PropertyAlertDeliveriesTable;
   scraper_runs: ScraperRunsTable;
 }
 

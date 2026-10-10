@@ -9,6 +9,7 @@ import { SearchSort, SearchResultItem } from "@/lib/search/types";
 import { SORT_LABELS, RENT_BASED_TRANSACTION_TYPES } from "@/lib/labels";
 import { TransactionType } from "@/lib/validation";
 import AdCard from "@/components/AdCard";
+import PropertyAssistant from "@/components/PropertyAssistant";
 
 interface Option {
   id: number;
@@ -263,6 +264,7 @@ function AmlakSearchInner() {
 
   return (
     <div className="search-page">
+      <PropertyAssistant />
       <aside className="search-filters">
         <h2>جستجوی ملک</h2>
 
