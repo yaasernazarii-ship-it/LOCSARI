@@ -790,6 +790,7 @@ export interface ScraperImportLogsTable {
 export interface PropertyAlertsTable {
   id: Generated<number>;
   phone: string;
+  recipient_name: string | null;
   query_text: string;
   deal_type: string | null;
   property_type: string | null;

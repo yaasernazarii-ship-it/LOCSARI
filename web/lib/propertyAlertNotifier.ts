@@ -19,7 +19,7 @@ export async function notifyPropertyAlerts(advertisementId: number, propertyId: 
     }
     try {
       const link = `https://locationsari.ir/agahi/${ad.slug}`;
-      const response = await fetch("https://api.sms.ir/v1/send/verify", { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": process.env.SMSIR_API_KEY }, body: JSON.stringify({ mobile: alert.phone, templateId, parameters: [{ name: "link", value: link }] }) });
+      const response = await fetch("https://api.sms.ir/v1/send/verify", { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": process.env.SMSIR_API_KEY }, body: JSON.stringify({ mobile: alert.phone, templateId, parameters: [{ name: "name", value: alert.recipient_name ?? "کاربر گرامی" }, { name: "link", value: link }] }) });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       await db.insertInto("property_alert_deliveries").values({ property_alert_id: alert.id, advertisement_id: advertisementId, status: "sent" }).execute();
       await db.updateTable("property_alerts").set({ last_notified_advertisement_id: advertisementId, updated_at: new Date().toISOString() }).where("id", "=", alert.id).execute();
