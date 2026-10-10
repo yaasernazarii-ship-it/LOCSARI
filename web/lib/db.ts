@@ -814,6 +814,12 @@ export interface PropertyAlertDeliveriesTable {
   created_at: ColumnType<Date, string | undefined, never>;
 }
 
+export interface PropertyAssistantSettingsTable {
+  id: Generated<number>;
+  name: string;
+  updated_at: ColumnType<Date, string | undefined, string | undefined>;
+}
+
 export interface ScraperRunsTable {
   id: Generated<number>;
   bot_name: string;
@@ -893,6 +899,7 @@ export interface Database {
   scraper_import_logs: ScraperImportLogsTable;
   property_alerts: PropertyAlertsTable;
   property_alert_deliveries: PropertyAlertDeliveriesTable;
+  property_assistant_settings: PropertyAssistantSettingsTable;
   scraper_runs: ScraperRunsTable;
 }
 

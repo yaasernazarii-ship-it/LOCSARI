@@ -3,6 +3,13 @@ import { db } from "@/lib/db";
 import { normalizePhone, parsePropertyQuery, searchPropertyQuery } from "@/lib/propertyAlerts";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
+const DEFAULT_ASSISTANT_NAME = "دستیار نیازسنجی هوشمند شما";
+
+export async function GET() {
+  const settings = await db.selectFrom("property_assistant_settings").select("name").where("id", "=", 1).executeTakeFirst();
+  return NextResponse.json({ name: settings?.name ?? DEFAULT_ASSISTANT_NAME });
+}
+
 export async function POST(req: NextRequest) {
   if (!checkRateLimit(`property-assistant:${getClientIp(req)}`, 20, 10 * 60_000)) return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است" }, { status: 429 });
   const body = await req.json().catch(() => null) as { query?: unknown; phone?: unknown; name?: unknown; subscribe?: unknown } | null;

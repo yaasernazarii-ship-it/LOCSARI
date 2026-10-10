@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+
+const DEFAULT_ASSISTANT_NAME = "دستیار نیازسنجی هوشمند شما";
 
 type Result = { id: number; slug: string; title: string; primary_image: string | null };
 
@@ -9,10 +11,20 @@ export default function PropertyAssistant() {
   const [query, setQuery] = useState("");
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
+  const [assistantName, setAssistantName] = useState(DEFAULT_ASSISTANT_NAME);
   const [needsPhone, setNeedsPhone] = useState(false);
   const [results, setResults] = useState<Result[]>([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/property-assistant")
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        if (typeof data?.name === "string" && data.name.trim()) setAssistantName(data.name);
+      })
+      .catch(() => undefined);
+  }, []);
 
   async function submit(subscribe = false) {
     if (!query.trim()) {
@@ -34,7 +46,7 @@ export default function PropertyAssistant() {
   }
 
   return <section className="property-assistant">
-    <h2>دستیار نیازسنجی هوشمند شما <span>(خلاصه‌ای از ملکی که نیاز داری بنویس)</span></h2>
+    <h2>{assistantName} <span>(خلاصه‌ای از ملکی که نیاز داری بنویس)</span></h2>
     <div className="property-assistant__form">
       <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="مثلاً آپارتمان ۲ خوابه حوالی طالقانی تا ۴ میلیارد برای خرید" />
       <button type="button" className="btn-primary" disabled={loading} onClick={() => submit()}> {loading ? "در حال جست‌وجو…" : "جست‌وجو"} </button>

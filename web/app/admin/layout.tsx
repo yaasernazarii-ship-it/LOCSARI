@@ -35,6 +35,7 @@ const NAV_ITEMS: {
   { href: "/admin/vip-plans", label: "اشتراک VIP", icon: "Crown", permission: "vip.manage" },
   { href: "/admin/cip", label: "CIP", icon: "FileText", permission: "cip.manage" },
   { href: "/admin/chats", label: "گفتگوهای آگهی‌ها", icon: "MessageCircle", permission: "chat.view" },
+  { href: "/admin/property-assistant", label: "نیازسنجی هوشمند", icon: "MessageCircle", permission: "admin.dashboard.view" },
   { href: "/admin/categories", label: "دسته‌بندی‌ها", icon: "Tags", permission: "category.view" },
   { href: "/admin/locations", label: "موقعیت‌های جغرافیایی", icon: "MapPin", permission: "location.view" },
   { href: "/admin/content", label: "محتوا", icon: "FileText", permission: "content.view" },
