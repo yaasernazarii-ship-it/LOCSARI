@@ -26,6 +26,23 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+self.addEventListener("push", (event) => {
+  const data = event.data ? event.data.json() : {};
+  event.waitUntil(
+    self.registration.showNotification(data.title || "لوکیشن ساری", {
+      body: data.body || "آگهی جدیدی برای شما ثبت شده است.",
+      icon: "/icon-192-v2.png",
+      badge: "/icon-192-v2.png",
+      data: { url: data.url || "/amlak" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow(event.notification.data.url));
+});
+
 // همهٔ درخواست‌ها ابتدا از شبکه گرفته می‌شوند تا محتوای همیشه به‌روز باشد؛
 // کش فقط به‌عنوان جایگزین حالت آفلاین (قطع اینترنت) استفاده می‌شود، نه برای سرعت.
 self.addEventListener("fetch", (event) => {

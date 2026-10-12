@@ -11,7 +11,14 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است" }, { status: 429 });
   }
 
-  const body = await req.json().catch(() => null) as { name?: unknown } | null;
+  const body = await req.json().catch(() => null) as { name?: unknown; alertId?: unknown; isActive?: unknown } | null;
+  if (typeof body?.alertId === "number" && typeof body.isActive === "boolean") {
+    const alert = await db.updateTable("property_alerts").set({ is_active: body.isActive, updated_at: new Date().toISOString() }).where("id", "=", body.alertId).returning(["id", "is_active"]).executeTakeFirst();
+    if (!alert) return NextResponse.json({ error: "درخواست نیازسنجی پیدا نشد" }, { status: 404 });
+    await logAdminAction(auth.user.id, "update", "property_alerts", alert.id, { isActive: alert.is_active });
+    return NextResponse.json({ alert });
+  }
+
   const name = typeof body?.name === "string" ? body.name.trim().slice(0, 120) : "";
   if (!name) return NextResponse.json({ error: "نام دستیار را وارد کنید" }, { status: 400 });
 

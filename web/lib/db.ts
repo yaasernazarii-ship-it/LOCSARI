@@ -801,6 +801,7 @@ export interface PropertyAlertsTable {
   max_area: ColumnType<string | null, number | string | null, number | string | null>;
   is_active: Generated<boolean>;
   last_notified_advertisement_id: number | null;
+  push_token: string;
   created_at: ColumnType<Date, string | undefined, never>;
   updated_at: ColumnType<Date, string | undefined, string | undefined>;
 }
@@ -818,6 +819,26 @@ export interface PropertyAssistantSettingsTable {
   id: Generated<number>;
   name: string;
   updated_at: ColumnType<Date, string | undefined, string | undefined>;
+}
+
+export interface PushSubscriptionsTable {
+  id: Generated<number>;
+  property_alert_id: number;
+  endpoint: string;
+  p256dh_key: string;
+  auth_key: string;
+  created_at: ColumnType<Date, string | undefined, never>;
+  updated_at: ColumnType<Date, string | undefined, string | undefined>;
+}
+
+export interface PushDeliveriesTable {
+  id: Generated<number>;
+  property_alert_id: number;
+  advertisement_id: number;
+  push_subscription_id: number | null;
+  status: string;
+  error_message: string | null;
+  created_at: ColumnType<Date, string | undefined, never>;
 }
 
 export interface ScraperRunsTable {
@@ -900,6 +921,8 @@ export interface Database {
   property_alerts: PropertyAlertsTable;
   property_alert_deliveries: PropertyAlertDeliveriesTable;
   property_assistant_settings: PropertyAssistantSettingsTable;
+  push_subscriptions: PushSubscriptionsTable;
+  push_deliveries: PushDeliveriesTable;
   scraper_runs: ScraperRunsTable;
 }
 

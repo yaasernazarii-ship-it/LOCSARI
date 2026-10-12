@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { normalizePhone, parsePropertyQuery, searchPropertyQuery } from "@/lib/propertyAlerts";
@@ -19,17 +20,19 @@ export async function POST(req: NextRequest) {
   const results = await searchPropertyQuery(parsed);
   const wantsAlert = body?.subscribe === true || results.length === 0;
   let alertCreated = false;
+  let alert: { id: number; pushToken: string } | null = null;
   if (wantsAlert && body?.phone) {
     const phone = normalizePhone(String(body.phone));
     const recipientName = typeof body.name === "string" ? body.name.trim().slice(0, 120) : "";
     if (!phone) return NextResponse.json({ error: "شماره موبایل معتبر نیست" }, { status: 400 });
     if (!recipientName) return NextResponse.json({ error: "نام و نام خانوادگی را وارد کنید" }, { status: 400 });
-    await db.insertInto("property_alerts").values({
+    const createdAlert = await db.insertInto("property_alerts").values({
       phone, recipient_name: recipientName, query_text: queryText, deal_type: parsed.dealType, property_type: parsed.propertyType,
       neighborhood_id: parsed.neighborhoodId, min_price: parsed.minPrice, max_price: parsed.maxPrice,
-      min_area: parsed.minArea, max_area: parsed.maxArea,
-    }).execute();
+      min_area: parsed.minArea, max_area: parsed.maxArea, push_token: randomUUID(),
+    }).returning(["id", "push_token"]).executeTakeFirstOrThrow();
+    alert = { id: createdAlert.id, pushToken: createdAlert.push_token };
     alertCreated = true;
   }
-  return NextResponse.json({ parsed, results, needsPhone: wantsAlert && !alertCreated, alertCreated });
+  return NextResponse.json({ parsed, results, needsPhone: wantsAlert && !alertCreated, alertCreated, alert });
 }

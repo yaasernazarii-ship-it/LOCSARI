@@ -8,6 +8,7 @@ export type PropertyQuery = {
   maxPrice: number | null;
   minArea: number | null;
   maxArea: number | null;
+  bedrooms: number | null;
 };
 
 function digits(value: string) {
@@ -23,20 +24,33 @@ function amount(value: string) {
   return number;
 }
 
+function range(text: string, unit: "price" | "area") {
+  const number = "[۰-۹\\d٬،,]+";
+  const suffix = unit === "price" ? "\\s*(میلیارد|میلیون)?" : "\\s*متر";
+  const between = text.match(new RegExp(`بین\\s*(${number})${suffix}\\s*(?:تا|الی)\\s*(${number})${suffix}`));
+  if (between) return { min: amount(between[1] + (between[2] ?? "")), max: amount(between[3] + (between[4] ?? "")) };
+  const maximum = text.match(new RegExp(`(?:تا|حداکثر|زیر)\\s*(${number})${suffix}`));
+  const minimum = text.match(new RegExp(`(?:از|حداقل|بیشتر از)\\s*(${number})${suffix}`));
+  const exact = unit === "area" ? text.match(new RegExp(`(${number})\\s*متر`)) : null;
+  return { min: minimum ? amount(minimum[1] + (minimum[2] ?? "")) : exact ? amount(exact[1]) : null, max: maximum ? amount(maximum[1] + (maximum[2] ?? "")) : exact ? amount(exact[1]) : null };
+}
+
 export async function parsePropertyQuery(queryText: string): Promise<PropertyQuery> {
   const text = queryText.trim();
   const neighborhoods = await db.selectFrom("neighborhoods").select(["id", "name"]).where("is_active", "=", true).execute();
   const neighborhood = neighborhoods.find((item) => text.includes(item.name));
-  const priceMatch = text.match(/(?:تا|حداکثر|زیر)\s*([۰-۹\d٬،,]+)\s*(میلیارد|میلیون)?/);
-  const areaMatch = text.match(/([۰-۹\d٬،,]+)\s*متر/);
+  const priceRange = range(text, "price");
+  const areaRange = range(text, "area");
+  const bedroomsMatch = digits(text).match(/(\d+)\s*(?:خوابه|خواب)/);
   return {
     dealType: /رهن|اجاره/.test(text) ? "mortgage_rent" : /خرید|فروش/.test(text) ? "sale" : null,
     propertyType: /ویلا|کلبه/.test(text) ? "villa" : /زمین|باغ/.test(text) ? "land" : /آپارتمان|خانه/.test(text) ? "apartment" : null,
     neighborhoodId: neighborhood?.id ?? null,
-    minPrice: null,
-    maxPrice: priceMatch ? amount(priceMatch[1] + (priceMatch[2] ?? "")) : null,
-    minArea: areaMatch ? amount(areaMatch[1]) : null,
-    maxArea: areaMatch ? amount(areaMatch[1]) : null,
+    minPrice: priceRange.min,
+    maxPrice: priceRange.max,
+    minArea: areaRange.min,
+    maxArea: areaRange.max,
+    bedrooms: bedroomsMatch ? Number(bedroomsMatch[1]) : null,
   };
 }
 
@@ -51,8 +65,11 @@ export async function searchPropertyQuery(query: PropertyQuery) {
     .where("properties.is_active", "=", true);
   if (query.dealType) builder = builder.where("advertisements.transaction_type", "=", query.dealType);
   if (query.neighborhoodId) builder = builder.where("properties.neighborhood_id", "=", query.neighborhoodId);
+  if (query.minPrice !== null) builder = builder.where("advertisements.price", ">=", String(query.minPrice));
   if (query.maxPrice !== null) builder = builder.where("advertisements.price", "<=", String(query.maxPrice));
-  if (query.minArea !== null) builder = builder.where("properties.area", "=", String(query.minArea));
+  if (query.minArea !== null) builder = builder.where("properties.area", ">=", String(query.minArea));
+  if (query.maxArea !== null) builder = builder.where("properties.area", "<=", String(query.maxArea));
+  if (query.bedrooms !== null) builder = builder.where("properties.bedrooms", "=", query.bedrooms);
   if (query.propertyType) {
     const slug = query.propertyType === "villa" ? "%vila%" : query.propertyType === "land" ? "%zamin%" : "%apartman%";
     builder = builder.where("categories.slug", "like", slug);

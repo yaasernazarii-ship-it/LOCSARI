@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { notifyPropertyAlertPush } from "@/lib/propertyPushNotifier";
 
 export async function notifyPropertyAlerts(advertisementId: number, propertyId: number) {
   const ad = await db.selectFrom("advertisements").innerJoin("properties", "properties.id", "advertisements.property_id").select(["advertisements.id", "advertisements.slug", "advertisements.transaction_type", "advertisements.price", "properties.category_id", "properties.neighborhood_id", "properties.area"]).where("advertisements.id", "=", advertisementId).where("properties.id", "=", propertyId).executeTakeFirst();
@@ -10,6 +11,7 @@ export async function notifyPropertyAlerts(advertisementId: number, propertyId: 
     if (alert.neighborhood_id && alert.neighborhood_id !== ad.neighborhood_id) continue;
     if (alert.max_price !== null && ad.price !== null && Number(ad.price) > Number(alert.max_price)) continue;
     if (alert.min_area !== null && ad.area !== null && Number(ad.area) < Number(alert.min_area)) continue;
+    await notifyPropertyAlertPush(alert.id, ad);
     const existing = await db.selectFrom("property_alert_deliveries").select("id").where("property_alert_id", "=", alert.id).where("advertisement_id", "=", advertisementId).executeTakeFirst();
     if (existing) continue;
     const templateId = Number(process.env.SMSIR_PROPERTY_ALERT_TEMPLATE_ID);
