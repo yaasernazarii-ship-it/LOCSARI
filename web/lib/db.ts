@@ -799,6 +799,11 @@ export interface PropertyAlertsTable {
   max_price: ColumnType<string | null, number | string | null, number | string | null>;
   min_area: ColumnType<string | null, number | string | null, number | string | null>;
   max_area: ColumnType<string | null, number | string | null, number | string | null>;
+  min_deposit: ColumnType<string | null, number | string | null, number | string | null>;
+  max_deposit: ColumnType<string | null, number | string | null, number | string | null>;
+  min_monthly_rent: ColumnType<string | null, number | string | null, number | string | null>;
+  max_monthly_rent: ColumnType<string | null, number | string | null, number | string | null>;
+  bedrooms: number | null;
   is_active: Generated<boolean>;
   last_notified_advertisement_id: number | null;
   push_token: string;

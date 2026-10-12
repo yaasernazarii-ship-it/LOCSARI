@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
     const createdAlert = await db.insertInto("property_alerts").values({
       phone, recipient_name: recipientName, query_text: queryText, deal_type: parsed.dealType, property_type: parsed.propertyType,
       neighborhood_id: parsed.neighborhoodId, min_price: parsed.minPrice, max_price: parsed.maxPrice,
-      min_area: parsed.minArea, max_area: parsed.maxArea, push_token: randomUUID(),
+      min_area: parsed.minArea, max_area: parsed.maxArea, min_deposit: parsed.minDeposit, max_deposit: parsed.maxDeposit,
+      min_monthly_rent: parsed.minRent, max_monthly_rent: parsed.maxRent, bedrooms: parsed.bedrooms, push_token: randomUUID(),
     }).returning(["id", "push_token"]).executeTakeFirstOrThrow();
     alert = { id: createdAlert.id, pushToken: createdAlert.push_token };
     alertCreated = true;
