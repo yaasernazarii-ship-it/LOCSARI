@@ -4,6 +4,7 @@ import { requirePermission } from "@/lib/apiAuth";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { logAdminAction } from "@/lib/audit";
 import { storage, ALLOWED_IMAGE_MIME_TYPES, MAX_IMAGE_SIZE_BYTES } from "@/lib/storage";
+import { getManagedAgencyId } from "@/lib/agencyAccess";
 
 // POST /api/account/agency/logo — بارگذاری لوگوی آژانس (فقط مالک؛ بخش ۲۶)
 export async function POST(req: NextRequest) {
@@ -14,8 +15,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است" }, { status: 429 });
   }
 
-  const agency = await db.selectFrom("agencies").select(["id"]).where("owner_user_id", "=", auth.user.id).executeTakeFirst();
-  if (!agency) return NextResponse.json({ error: "آژانسی یافت نشد" }, { status: 404 });
+  const agencyId = await getManagedAgencyId(auth.user.id);
+  if (!agencyId) return NextResponse.json({ error: "آژانسی برای مدیریت یافت نشد" }, { status: 404 });
+  const agency = { id: agencyId };
 
   const formData = await req.formData().catch(() => null);
   const file = formData?.get("file");

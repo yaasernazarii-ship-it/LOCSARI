@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
 import { db } from "@/lib/db";
+import { getManagedAgencyId } from "@/lib/agencyAccess";
 import AgencyAccountPanel from "@/components/AgencyAccountPanel";
 import VipAccountPanel from "@/components/VipAccountPanel";
 
@@ -11,10 +12,15 @@ export default async function AgencyAccountPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login?next=/account/agency");
 
+  const agencyId = await getManagedAgencyId(user.id);
   const ads = await db
     .selectFrom("advertisements")
     .select(["id", "title", "slug", "status", "is_vip", "vip_expires_at"])
-    .where("created_by_user_id", "=", user.id)
+    .where((eb) =>
+      agencyId
+        ? eb.or([eb("created_by_user_id", "=", user.id), eb("agency_id", "=", agencyId)])
+        : eb("created_by_user_id", "=", user.id),
+    )
     .where("status", "not in", ["archived", "rejected"])
     .orderBy("created_at", "desc")
     .execute();

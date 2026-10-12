@@ -157,21 +157,43 @@ export default function ConsultantAccountPanel() {
   }
 
   async function respondInvitation(id: number, action: "accept" | "reject") {
-    const res = await fetch(`/api/account/memberships/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action }),
-    });
-    if (res.ok) load();
+    setError("");
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/account/memberships/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "پاسخ به دعوت انجام نشد");
+      setNotice(action === "accept" ? "دعوت آژانس پذیرفته شد." : "دعوت آژانس رد شد.");
+      load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "پاسخ به دعوت انجام نشد");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function updateVipAssignment(id: number, status: string, resultNote: string) {
-    const res = await fetch(`/api/account/consultant/vip-assignments/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, resultNote: resultNote.trim() || null }),
-    });
-    if (res.ok) load();
+    setError("");
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/account/consultant/vip-assignments/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, resultNote: resultNote.trim() || null }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "ثبت وضعیت پیگیری انجام نشد");
+      setNotice("وضعیت پیگیری آگهی ذخیره شد.");
+      load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "ثبت وضعیت پیگیری انجام نشد");
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (loading) return <p>در حال بارگذاری…</p>;
@@ -221,6 +243,8 @@ export default function ConsultantAccountPanel() {
 
   return (
     <>
+      {error && <div className="error-box">{error}</div>}
+      {notice && <div className="success-box">{notice}</div>}
       <div className="form-section">
         <h2>
           وضعیت پروفایل مشاور{" "}
@@ -302,10 +326,10 @@ export default function ConsultantAccountPanel() {
                   {m.agency_name} — {MEMBERSHIP_ROLE_LABELS[m.membership_role]}
                 </span>
                 <div className="member-row__actions">
-                  <button type="button" className="btn-primary" onClick={() => respondInvitation(m.id, "accept")}>
+                  <button type="button" className="btn-primary" disabled={saving} onClick={() => respondInvitation(m.id, "accept")}>
                     پذیرفتن
                   </button>
-                  <button type="button" className="btn-secondary" onClick={() => respondInvitation(m.id, "reject")}>
+                  <button type="button" className="btn-secondary" disabled={saving} onClick={() => respondInvitation(m.id, "reject")}>
                     رد کردن
                   </button>
                 </div>
@@ -334,7 +358,7 @@ export default function ConsultantAccountPanel() {
           <h2>آگهی‌های VIP در مسئولیت شما</h2>
           <p>وضعیت پیگیری و نتیجهٔ کار روی هر آگهی را اینجا ثبت کنید.</p>
           {vipAssignments.map((a) => (
-            <VipAssignmentRow key={a.id} assignment={a} onSave={updateVipAssignment} />
+            <VipAssignmentRow key={a.id} assignment={a} saving={saving} onSave={updateVipAssignment} />
           ))}
         </div>
       )}
@@ -344,9 +368,11 @@ export default function ConsultantAccountPanel() {
 
 function VipAssignmentRow({
   assignment,
+  saving,
   onSave,
 }: {
   assignment: VipAssignment;
+  saving: boolean;
   onSave: (id: number, status: string, resultNote: string) => void;
 }) {
   const [status, setStatus] = useState(assignment.status);
@@ -359,7 +385,7 @@ function VipAssignmentRow({
         <span className={`status-badge status-badge--${status}`}>{TASK_STATUS_LABELS[status] ?? status}</span>
       </span>
       <div className="range-inputs">
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+        <select value={status} disabled={saving} onChange={(e) => setStatus(e.target.value)}>
           {TASK_STATUSES.map((s) => (
             <option key={s} value={s}>
               {TASK_STATUS_LABELS[s]}
@@ -370,9 +396,10 @@ function VipAssignmentRow({
           type="text"
           placeholder="نتیجهٔ پیگیری"
           value={resultNote}
+          disabled={saving}
           onChange={(e) => setResultNote(e.target.value)}
         />
-        <button type="button" className="btn-primary" onClick={() => onSave(assignment.id, status, resultNote)}>
+        <button type="button" className="btn-primary" disabled={saving} onClick={() => onSave(assignment.id, status, resultNote)}>
           ذخیره
         </button>
       </div>

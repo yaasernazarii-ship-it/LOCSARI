@@ -179,24 +179,44 @@ export default function AgencyAccountPanel() {
   async function invite(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const res = await fetch("/api/account/agency/members", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone: invitePhone.trim(), membershipRole: "consultant" }),
-    });
-    const data = await res.json();
-    if (!res.ok) return setError(data.error || "خطا در دعوت");
-    setInvitePhone("");
-    load();
+    setNotice("");
+    setSaving(true);
+    try {
+      const res = await fetch("/api/account/agency/members", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: invitePhone.trim(), membershipRole: "consultant" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "خطا در دعوت");
+      setInvitePhone("");
+      setNotice("دعوت‌نامه برای مشاور ثبت شد.");
+      load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "خطا در دعوت");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function manageMember(id: number, action: string) {
-    const res = await fetch(`/api/account/agency/members/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action }),
-    });
-    if (res.ok) load();
+    setError("");
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/account/agency/members/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "تغییر وضعیت عضو انجام نشد");
+      setNotice("وضعیت عضو به‌روزرسانی شد.");
+      load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "تغییر وضعیت عضو انجام نشد");
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (loading) return <p>در حال بارگذاری…</p>;
@@ -349,8 +369,8 @@ export default function AgencyAccountPanel() {
         <h2>اعضای آژانس</h2>
         <form onSubmit={invite} className="range-inputs">
           <input type="text" placeholder="شمارهٔ موبایل مشاور برای دعوت" value={invitePhone} onChange={(e) => setInvitePhone(e.target.value)} />
-          <button type="submit" className="btn-primary">
-            دعوت
+          <button type="submit" className="btn-primary" disabled={saving}>
+            {saving ? "در حال ثبت…" : "دعوت"}
           </button>
         </form>
         {members.map((m) => (
@@ -362,21 +382,26 @@ export default function AgencyAccountPanel() {
             <div className="member-row__actions">
               {m.status === "pending" && m.invited_by_user_id === null && (
                 <>
-                  <button type="button" className="btn-primary" onClick={() => manageMember(m.id, "accept")}>
+                  <button type="button" className="btn-primary" disabled={saving} onClick={() => manageMember(m.id, "accept")}>
                     پذیرفتن
                   </button>
-                  <button type="button" className="btn-secondary" onClick={() => manageMember(m.id, "reject")}>
+                  <button type="button" className="btn-secondary" disabled={saving} onClick={() => manageMember(m.id, "reject")}>
                     رد کردن
                   </button>
                 </>
               )}
               {m.status === "active" && (
-                <button type="button" className="btn-danger" onClick={() => manageMember(m.id, "remove")}>
-                  حذف عضو
-                </button>
+                <>
+                  <button type="button" className="btn-secondary" disabled={saving} onClick={() => manageMember(m.id, "suspend")}>
+                    تعلیق عضو
+                  </button>
+                  <button type="button" className="btn-danger" disabled={saving} onClick={() => manageMember(m.id, "remove")}>
+                    حذف عضو
+                  </button>
+                </>
               )}
               {m.status === "suspended" && (
-                <button type="button" className="btn-secondary" onClick={() => manageMember(m.id, "reactivate")}>
+                <button type="button" className="btn-secondary" disabled={saving} onClick={() => manageMember(m.id, "reactivate")}>
                   فعال‌سازی مجدد
                 </button>
               )}

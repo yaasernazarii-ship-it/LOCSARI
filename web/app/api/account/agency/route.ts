@@ -6,13 +6,15 @@ import { logAdminAction } from "@/lib/audit";
 import { validateAgencyInput } from "@/lib/agencyInput";
 import { validateSocialLinks, replaceSocialLinks, getSocialLinks } from "@/lib/socialLinks";
 import { buildUniqueSlug } from "@/lib/slug";
+import { getManagedAgencyId } from "@/lib/agencyAccess";
 
 // GET /api/account/agency — آژانسِ متعلق به کاربر واردشده (یا null)
 export async function GET() {
   const auth = await requirePermission("agency.view");
   if (auth.response) return auth.response;
 
-  const agency = await db.selectFrom("agencies").selectAll().where("owner_user_id", "=", auth.user.id).executeTakeFirst();
+  const agencyId = await getManagedAgencyId(auth.user.id);
+  const agency = agencyId ? await db.selectFrom("agencies").selectAll().where("id", "=", agencyId).executeTakeFirst() : undefined;
   if (!agency) return NextResponse.json({ agency: null });
 
   const socialLinks = await getSocialLinks(db, "agency", agency.id);
@@ -104,8 +106,9 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است" }, { status: 429 });
   }
 
-  const agency = await db.selectFrom("agencies").selectAll().where("owner_user_id", "=", auth.user.id).executeTakeFirst();
-  if (!agency) return NextResponse.json({ error: "آژانسی یافت نشد" }, { status: 404 });
+  const agencyId = await getManagedAgencyId(auth.user.id);
+  const agency = agencyId ? await db.selectFrom("agencies").selectAll().where("id", "=", agencyId).executeTakeFirst() : undefined;
+  if (!agency) return NextResponse.json({ error: "آژانسی برای مدیریت یافت نشد" }, { status: 404 });
 
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object") return NextResponse.json({ error: "بدنهٔ درخواست نامعتبر است" }, { status: 400 });

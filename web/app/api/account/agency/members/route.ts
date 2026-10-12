@@ -7,6 +7,11 @@ import { logAdminAction } from "@/lib/audit";
 import { isValidIranianPhone } from "@/lib/auth";
 import { isValidMembershipRole } from "@/lib/validation";
 
+function normalizePhone(value: string) {
+  const phone = value.replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit))).replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit))).replace(/[\s-]/g, "").replace(/^\+98/, "0").replace(/^0098/, "0");
+  return phone;
+}
+
 // GET /api/account/agency/members — لیست اعضای آژانسِ خودِ کاربر (owner/manager)
 export async function GET() {
   const auth = await requirePermission("membership.view");
@@ -53,8 +58,9 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object") return NextResponse.json({ error: "بدنهٔ درخواست نامعتبر است" }, { status: 400 });
 
-  const { phone, membershipRole } = body as { phone?: unknown; membershipRole?: unknown };
-  if (typeof phone !== "string" || !isValidIranianPhone(phone)) {
+  const { phone: rawPhone, membershipRole } = body as { phone?: unknown; membershipRole?: unknown };
+  const phone = typeof rawPhone === "string" ? normalizePhone(rawPhone) : "";
+  if (!isValidIranianPhone(phone)) {
     return NextResponse.json({ error: "شمارهٔ موبایل نامعتبر است" }, { status: 400 });
   }
   const role = membershipRole === undefined ? "consultant" : membershipRole;
