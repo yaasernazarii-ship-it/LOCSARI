@@ -2,14 +2,14 @@ const https = require("https");
 
 const baseUrl = process.env.SMOKE_BASE_URL || "https://locationsari.ir";
 const paths = [
-  { path: "/", expectedStatus: 200, expectedContentType: "text/html" },
+  { path: "/", expectedStatus: 307, expectedContentType: "text/html", expectedLocation: "/amlak" },
   { path: "/amlak", expectedStatus: 200, expectedContentType: "text/html" },
   { path: "/api/property-assistant", expectedStatus: 200, expectedContentType: "application/json", validate: (body) => typeof body.name === "string" },
   { path: "/api/push/public-key", expectedStatus: 200, expectedContentType: "application/json", validate: (body) => typeof body.enabled === "boolean" },
   { path: "/sw.js", expectedStatus: 200, expectedContentType: "javascript" },
 ];
 
-function request({ path, expectedStatus, expectedContentType, validate }) {
+function request({ path, expectedStatus, expectedContentType, expectedLocation, validate }) {
   return new Promise((resolve, reject) => {
     const url = new URL(path, baseUrl);
     https.get(url, { timeout: 20_000 }, (response) => {
@@ -18,7 +18,7 @@ function request({ path, expectedStatus, expectedContentType, validate }) {
       response.on("data", (chunk) => { text += chunk; });
       response.on("end", () => {
         const contentType = response.headers["content-type"] || "";
-        if (response.statusCode !== expectedStatus || !contentType.includes(expectedContentType)) {
+        if (response.statusCode !== expectedStatus || !contentType.includes(expectedContentType) || (expectedLocation && response.headers.location !== expectedLocation)) {
           reject(new Error(`${path}: پاسخ نامعتبر (${response.statusCode}, ${contentType})`));
           return;
         }
