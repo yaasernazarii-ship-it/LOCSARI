@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "ir.locationsari.twa",
+        "sha256_cert_fingerprints": ["1C:47:12:4E:22:22:1D:F4:94:C2:70:2C:98:F5:F1:D7:9C:4F:BC:56:6C:F4:2B:30:5E:C9:AF:92:6C:D9:96:CD"]
+      }
+    }]
