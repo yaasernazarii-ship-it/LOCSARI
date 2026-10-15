@@ -3215,3 +3215,208 @@ a.contact-info-card:hover {
 .property-assistant__results a:hover { background: rgba(255, 255, 255, .88); box-shadow: 0 10px 22px rgba(30, 87, 167, .13); transform: translateY(-2px); }
 .property-assistant__results img { width: 56px; height: 42px; object-fit: cover; border-radius: 8px; }
 @media (max-width: 640px) { .property-assistant { padding: 20px; border-radius: 20px; } .property-assistant__form { flex-direction: column; align-items: stretch; } .property-assistant__form > .btn-primary, .property-assistant__form > .btn-secondary { width: 100%; } }
+
+/* ---------- صفحهٔ دریافت اپلیکیشن ---------- */
+
+.app-download-page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 56px 20px 72px;
+}
+
+.app-download-hero {
+  max-width: 670px;
+  margin: 0 auto 36px;
+  text-align: center;
+}
+
+.app-download-hero__icon,
+.app-download-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #0145c9;
+  background: #e9f0ff;
+  border-radius: 16px;
+}
+
+.app-download-hero__icon {
+  width: 66px;
+  height: 66px;
+  margin-bottom: 16px;
+}
+
+.app-download-hero__eyebrow {
+  margin: 0 0 8px;
+  color: #0145c9;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.app-download-hero h1 {
+  margin: 0;
+  color: #10213f;
+  font-size: clamp(1.65rem, 4vw, 2.35rem);
+  line-height: 1.5;
+}
+
+.app-download-hero > p:last-child {
+  margin: 14px 0 0;
+  color: #526277;
+  line-height: 2;
+}
+
+.app-download-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.app-download-card,
+.app-download-ios {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 12px 28px rgba(15, 47, 94, 0.06);
+  padding: 25px;
+}
+
+.app-download-card--featured {
+  border-color: #93b4f4;
+  background: linear-gradient(145deg, #fff 0%, #f1f6ff 100%);
+}
+
+.app-download-card__icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+
+.app-download-card h2,
+.app-download-ios h2 {
+  margin: 0;
+  color: #14213d;
+  font-size: 1.2rem;
+}
+
+.app-download-card p,
+.app-download-ios__header p {
+  margin: 8px 0 20px;
+  color: #5d6b7d;
+  line-height: 1.9;
+  font-size: 0.92rem;
+}
+
+.app-download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  border-radius: 11px;
+  padding: 11px 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.app-download-button--primary {
+  color: #fff;
+  background: #0145c9;
+}
+
+.app-download-button--primary:hover {
+  background: #0139a8;
+}
+
+.app-download-button--disabled {
+  color: #6b7280;
+  background: #f1f5f9;
+  cursor: not-allowed;
+}
+
+.app-download-card__note {
+  margin: 14px 0 0 !important;
+  font-size: 0.78rem !important;
+}
+
+.app-download-ios {
+  padding: 28px;
+}
+
+.app-download-ios__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.app-download-ios__header .app-download-card__icon {
+  flex: 0 0 auto;
+}
+
+.app-download-ios__steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  list-style: none;
+  margin: 10px 0 18px;
+  padding: 0;
+}
+
+.app-download-ios__steps li {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.app-download-ios__steps span {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  color: #0145c9;
+  background: #dbeafe;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.app-download-ios__steps strong {
+  color: #26364f;
+  font-size: 0.87rem;
+}
+
+.app-download-ios__steps p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 0.77rem;
+  line-height: 1.8;
+}
+
+.app-download-ios__steps svg {
+  vertical-align: -2px;
+}
+
+.app-download-ios__result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+  color: #166534;
+  background: #f0fdf4;
+  border-radius: 10px;
+  font-size: 0.87rem;
+}
+
+@media (max-width: 680px) {
+  .app-download-page { padding: 36px 16px 52px; }
+  .app-download-options { grid-template-columns: 1fr; }
+  .app-download-card, .app-download-ios { padding: 20px; border-radius: 16px; }
+  .app-download-ios__steps { grid-template-columns: 1fr; }
+}

@@ -24,6 +24,7 @@ export default function HeaderMobileMenu({ user }: { user: HeaderUser }) {
         <Link href="/vip" onClick={closeMenu}>آگهی‌های VIP</Link>
         <Link href="/cip" onClick={closeMenu}>آگهی‌های CIP</Link>
         <Link href="/account/advertisements/new" onClick={closeMenu}>ثبت آگهی</Link>
+        <Link href="/app" onClick={closeMenu}>دریافت اپلیکیشن</Link>
         <Link href="/p/about" onClick={closeMenu}>درباره ما</Link>
         <Link href="/contact" onClick={closeMenu}>تماس با ما</Link>
 
