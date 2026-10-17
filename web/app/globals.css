@@ -3420,3 +3420,14 @@ a.contact-info-card:hover {
   .app-download-card, .app-download-ios { padding: 20px; border-radius: 16px; }
   .app-download-ios__steps { grid-template-columns: 1fr; }
 }
+
+.cip-portrait-video {
+  display: block;
+  width: min(100%, 430px);
+  max-height: 78vh;
+  margin: 0 auto;
+  border-radius: 16px;
+  background: #080d18;
+  object-fit: contain;
+  box-shadow: 0 14px 34px rgba(8, 13, 24, 0.18);
+}

@@ -75,7 +75,8 @@ export default async function AdvertisementDetailPage({ params }: Props) {
   const isOwner = !!userId && ownerRow?.created_by_user_id === userId;
 
   const vipEmbedUrl = ad.vip.isVip && ad.vip.videoUrl ? toAparatEmbedUrl(ad.vip.videoUrl) : null;
-  const cipEmbedUrl = cipRow?.video_url ? toAparatEmbedUrl(cipRow.video_url) : null;
+  const cipVideoUrl = cipRow?.video_url ?? null;
+  const cipEmbedUrl = cipVideoUrl?.startsWith("/uploads/") ? null : cipVideoUrl ? toAparatEmbedUrl(cipVideoUrl) : null;
 
   return (
     <div className="detail-page">
@@ -113,12 +114,19 @@ export default async function AdvertisementDetailPage({ params }: Props) {
         </section>
       )}
 
-      {cipEmbedUrl && (
+      {cipVideoUrl && (
         <section className="detail-section">
           <h2>ویدیوی اختصاصی CIP</h2>
-          <div className="static-page__video" style={{ maxWidth: 860 }}>
-            <iframe src={cipEmbedUrl} allowFullScreen title={`ویدیوی CIP ${ad.title}`} />
-          </div>
+          {cipEmbedUrl ? (
+            <div className="static-page__video" style={{ maxWidth: 860 }}>
+              <iframe src={cipEmbedUrl} allowFullScreen title={`ویدیوی CIP ${ad.title}`} />
+            </div>
+          ) : (
+            <video className="cip-portrait-video" controls playsInline preload="metadata" poster={ad.media.find((media) => media.isPrimary)?.url}>
+              <source src={cipVideoUrl} />
+              مرورگر شما از پخش این ویدیو پشتیبانی نمی‌کند.
+            </video>
+          )}
         </section>
       )}
 

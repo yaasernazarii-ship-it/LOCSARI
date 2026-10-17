@@ -35,6 +35,7 @@ export default function AdminCipRequestRow({
   const [consultantId, setConsultantId] = useState(String(assignedConsultantId ?? ""));
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [aparatUrl, setAparatUrl] = useState(videoUrl ?? "");
   const [error, setError] = useState("");
 
@@ -78,6 +79,24 @@ export default function AdminCipRequestRow({
     }
   }
 
+  async function uploadVideo(file: File) {
+    setUploading(true);
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`/api/admin/cip-requests/${requestId}/video`, { method: "POST", body: formData });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || "خطا در بارگذاری ویدیو");
+      showToast("ویدیو روی سرور بارگذاری و آگهی CIP منتشر شد", "success");
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "خطا در بارگذاری ویدیو");
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return (
     <>
       <button type="button" className="btn-secondary admin-header-btn" onClick={() => setOpen((v) => !v)}>
@@ -112,7 +131,21 @@ export default function AdminCipRequestRow({
             {saving ? "در حال ذخیره..." : "ذخیره"}
           </button>
           <div className="form-group" style={{ marginTop: 12 }}>
-            <label>لینک ویدیوی آپارات برای انتشار</label>
+            <label>بارگذاری مستقیم ویدیوی عمودی</label>
+            <input
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime"
+              disabled={uploading || status === "awaiting_payment"}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) uploadVideo(file);
+                e.currentTarget.value = "";
+              }}
+            />
+            <small>{status === "awaiting_payment" ? "بارگذاری و انتشار ویدیو پس از تکمیل پرداخت فعال می‌شود." : "MP4، WebM یا MOV تا ۳۰ مگابایت. ویدیو به‌شکل عمودی پخش و تصویر اصلی آگهی به‌عنوان کاور افقی استفاده می‌شود."}</small>
+          </div>
+          <div className="form-group" style={{ marginTop: 12 }}>
+            <label>یا لینک ویدیوی آپارات برای انتشار</label>
             <input
               type="url"
               dir="ltr"
@@ -123,7 +156,7 @@ export default function AdminCipRequestRow({
             />
             <small>{status === "awaiting_payment" ? "ثبت و انتشار لینک ویدیو پس از تکمیل پرداخت فعال می‌شود." : "لینک معتبر آپارات را وارد کنید؛ با انتشار، آگهی در صفحهٔ عمومی CIP نمایش داده می‌شود."}</small>
           </div>
-          <button type="button" className="btn-primary admin-header-btn" disabled={publishing || status === "awaiting_payment" || !aparatUrl.trim()} onClick={publishAparatVideo}>
+          <button type="button" className="btn-primary admin-header-btn" disabled={publishing || uploading || status === "awaiting_payment" || !aparatUrl.trim()} onClick={publishAparatVideo}>
             {publishing ? "در حال انتشار..." : "انتشار با لینک آپارات"}
           </button>
           {videoUrl && <p><a href={videoUrl} target="_blank">مشاهدهٔ ویدیوی فعلی</a></p>}
