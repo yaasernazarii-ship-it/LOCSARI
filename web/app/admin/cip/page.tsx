@@ -3,7 +3,6 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/session";
 import { userHasPermission, getUserRoleKeys } from "@/lib/rbac";
 import { db } from "@/lib/db";
-import AdminCipVideoForm from "@/components/AdminCipVideoForm";
 import AdminCipFreePublishForm from "@/components/AdminCipFreePublishForm";
 
 export default async function AdminCipPage() {
@@ -41,7 +40,7 @@ export default async function AdminCipPage() {
       <div className="admin-page-header admin-page-header--row">
         <div>
           <h1>CIP</h1>
-          <p>مدیریت پلن‌های تولید ویدیو، درخواست‌های ثبت‌شده و ویدیوی معرفی بخش CIP.</p>
+          <p>مدیریت پلن‌های تولید ویدیو و درخواست‌های ثبت‌شدهٔ CIP.</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <Link href="/admin/cip/plans" className="btn-secondary admin-header-btn">پلن‌های CIP ({plansCount.toLocaleString("fa-IR")})</Link>
@@ -61,7 +60,6 @@ export default async function AdminCipPage() {
         </div>
       </div>
 
-      <AdminCipVideoForm />
       {isSuperAdmin && <AdminCipFreePublishForm plans={freePublishPlans} advertisements={freePublishAds} />}
     </>
   );

@@ -3,13 +3,12 @@ import { Check, Play, Sparkles } from "lucide-react";
 import { db } from "@/lib/db";
 import { getSiteContent } from "@/lib/siteContent";
 import { formatToman, formatPriceLine } from "@/lib/labels";
-import { toAparatEmbedUrl } from "@/lib/aparat";
 
 export const metadata = { title: "آگهی‌های CIP" };
 
 // صفحهٔ عمومی «آگهی‌های CIP» — آگهی‌هایی که برایشان ویدیوی اختصاصی ساخته و منتشر شده + معرفی پلن‌ها.
 export default async function CipPage() {
-  const [content, plans, videos, settings] = await Promise.all([
+  const [content, plans, videos] = await Promise.all([
     getSiteContent(),
     db.selectFrom("cip_plans").selectAll().where("is_active", "=", true).orderBy("sort_order", "asc").execute(),
     db
@@ -34,10 +33,7 @@ export default async function CipPage() {
       .where("advertisements.status", "=", "published")
       .orderBy("cip_requests.updated_at", "desc")
       .execute(),
-    db.selectFrom("cip_page_settings").select("video_url").where("id", "=", 1).executeTakeFirst(),
   ]);
-  const introductionVideoUrl = settings?.video_url ?? null;
-  const introductionEmbedUrl = introductionVideoUrl?.startsWith("/uploads/") ? null : introductionVideoUrl ? toAparatEmbedUrl(introductionVideoUrl) : null;
 
   return (
     <>
@@ -47,22 +43,6 @@ export default async function CipPage() {
           <p>{content["cip.hero_description"]}</p>
         </div>
       </section>
-
-      {introductionVideoUrl && (
-        <section className="home-section cip-introduction">
-          <div className="home-section__heading"><span className="cip-eyebrow">CIP EXPERIENCE</span><h2>{content["cip.intro_title"]}</h2><p>{content["cip.intro_description"]}</p></div>
-          <div className="cip-introduction__video">
-            {introductionEmbedUrl ? (
-              <iframe title="معرفی خدمات CIP" src={introductionEmbedUrl} allowFullScreen />
-            ) : (
-              <video className="cip-portrait-video" controls playsInline preload="metadata">
-                <source src={introductionVideoUrl} />
-                مرورگر شما از پخش این ویدیو پشتیبانی نمی‌کند.
-              </video>
-            )}
-          </div>
-        </section>
-      )}
 
       <section className="home-section cip-showcase">
         <div className="home-section__heading cip-showcase__heading">
