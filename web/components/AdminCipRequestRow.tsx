@@ -34,9 +34,7 @@ export default function AdminCipRequestRow({
   const [note, setNote] = useState(adminNote ?? "");
   const [consultantId, setConsultantId] = useState(String(assignedConsultantId ?? ""));
   const [saving, setSaving] = useState(false);
-  const [publishing, setPublishing] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [aparatUrl, setAparatUrl] = useState(videoUrl ?? "");
   const [error, setError] = useState("");
 
   async function save() {
@@ -56,26 +54,6 @@ export default function AdminCipRequestRow({
       setError(e instanceof Error ? e.message : "خطا در ذخیره");
     } finally {
       setSaving(false);
-    }
-  }
-
-  async function publishAparatVideo() {
-    setPublishing(true);
-    setError("");
-    try {
-      const res = await fetch(`/api/admin/cip-requests/${requestId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoUrl: aparatUrl.trim() }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.error || "خطا در انتشار ویدیو");
-      showToast("ویدیوی آپارات ثبت و آگهی CIP منتشر شد", "success");
-      router.refresh();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "خطا در انتشار ویدیو");
-    } finally {
-      setPublishing(false);
     }
   }
 
@@ -144,22 +122,7 @@ export default function AdminCipRequestRow({
             />
             <small>{status === "awaiting_payment" ? "بارگذاری و انتشار ویدیو پس از تکمیل پرداخت فعال می‌شود." : "MP4، WebM یا MOV تا ۱۰۰ مگابایت. ویدیو به‌شکل عمودی پخش و تصویر اصلی آگهی به‌عنوان کاور افقی استفاده می‌شود."}</small>
           </div>
-          <div className="form-group" style={{ marginTop: 12 }}>
-            <label>یا لینک ویدیوی آپارات برای انتشار</label>
-            <input
-              type="url"
-              dir="ltr"
-              placeholder="https://www.aparat.com/v/xxxxx"
-              value={aparatUrl}
-              disabled={status === "awaiting_payment"}
-              onChange={(e) => setAparatUrl(e.target.value)}
-            />
-            <small>{status === "awaiting_payment" ? "ثبت و انتشار لینک ویدیو پس از تکمیل پرداخت فعال می‌شود." : "لینک معتبر آپارات را وارد کنید؛ با انتشار، آگهی در صفحهٔ عمومی CIP نمایش داده می‌شود."}</small>
-          </div>
-          <button type="button" className="btn-primary admin-header-btn" disabled={publishing || uploading || status === "awaiting_payment" || !aparatUrl.trim()} onClick={publishAparatVideo}>
-            {publishing ? "در حال انتشار..." : "انتشار با لینک آپارات"}
-          </button>
-          {videoUrl && <p><a href={videoUrl} target="_blank">مشاهدهٔ ویدیوی فعلی</a></p>}
+          {videoUrl && <p><a href={videoUrl} target="_blank" rel="noreferrer">مشاهدهٔ ویدیوی فعلی</a></p>}
         </div>
       )}
     </>
