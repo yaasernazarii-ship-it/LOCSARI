@@ -31,6 +31,7 @@ export default function AdminCipFreePublishForm({
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error(data?.error || "خطا در ثبت درخواست CIP");
+      if (!data?.request?.id || typeof data.request.id !== "number") throw new Error("ثبت درخواست CIP ناموفق بود");
 
       if (videoFile) {
         const formData = new FormData();
@@ -44,6 +45,7 @@ export default function AdminCipFreePublishForm({
       setPlanId("");
       setAdvertisementId("");
       setVideoFile(null);
+      router.push("/admin/cip/requests");
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "خطا در ثبت درخواست CIP");
