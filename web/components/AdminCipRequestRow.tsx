@@ -142,7 +142,7 @@ export default function AdminCipRequestRow({
                 e.currentTarget.value = "";
               }}
             />
-            <small>{status === "awaiting_payment" ? "بارگذاری و انتشار ویدیو پس از تکمیل پرداخت فعال می‌شود." : "MP4، WebM یا MOV تا ۳۰ مگابایت. ویدیو به‌شکل عمودی پخش و تصویر اصلی آگهی به‌عنوان کاور افقی استفاده می‌شود."}</small>
+            <small>{status === "awaiting_payment" ? "بارگذاری و انتشار ویدیو پس از تکمیل پرداخت فعال می‌شود." : "MP4، WebM یا MOV تا ۱۰۰ مگابایت. ویدیو به‌شکل عمودی پخش و تصویر اصلی آگهی به‌عنوان کاور افقی استفاده می‌شود."}</small>
           </div>
           <div className="form-group" style={{ marginTop: 12 }}>
             <label>یا لینک ویدیوی آپارات برای انتشار</label>

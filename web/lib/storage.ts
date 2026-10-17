@@ -78,6 +78,6 @@ export const ALLOWED_VIDEO_MIME_TYPES: Record<string, string> = {
 };
 
 export const MAX_IMAGE_SIZE_BYTES = 30 * 1024 * 1024; // ۳۰ مگابایت
-export const MAX_VIDEO_SIZE_BYTES = 30 * 1024 * 1024; // ۳۰ مگابایت
+export const MAX_VIDEO_SIZE_BYTES = 100 * 1024 * 1024; // ۱۰۰ مگابایت
 export const MAX_MEDIA_PER_PROPERTY = 20;
 export const MAX_VIDEO_PER_PROPERTY = 3;
