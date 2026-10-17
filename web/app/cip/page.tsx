@@ -36,7 +36,8 @@ export default async function CipPage() {
       .execute(),
     db.selectFrom("cip_page_settings").select("video_url").where("id", "=", 1).executeTakeFirst(),
   ]);
-  const introductionVideoUrl = settings?.video_url ? toAparatEmbedUrl(settings.video_url) : null;
+  const introductionVideoUrl = settings?.video_url ?? null;
+  const introductionEmbedUrl = introductionVideoUrl?.startsWith("/uploads/") ? null : introductionVideoUrl ? toAparatEmbedUrl(introductionVideoUrl) : null;
 
   return (
     <>
@@ -51,7 +52,14 @@ export default async function CipPage() {
         <section className="home-section cip-introduction">
           <div className="home-section__heading"><span className="cip-eyebrow">CIP EXPERIENCE</span><h2>{content["cip.intro_title"]}</h2><p>{content["cip.intro_description"]}</p></div>
           <div className="cip-introduction__video">
-            <iframe title="معرفی خدمات CIP" src={introductionVideoUrl} allowFullScreen />
+            {introductionEmbedUrl ? (
+              <iframe title="معرفی خدمات CIP" src={introductionEmbedUrl} allowFullScreen />
+            ) : (
+              <video className="cip-portrait-video" controls playsInline preload="metadata">
+                <source src={introductionVideoUrl} />
+                مرورگر شما از پخش این ویدیو پشتیبانی نمی‌کند.
+              </video>
+            )}
           </div>
         </section>
       )}

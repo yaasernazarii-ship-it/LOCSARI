@@ -1,67 +1,62 @@
 "use client";
 
-// فرم مدیریت ویدیوی آپارات بخش CIP
-
 import { useEffect, useState } from "react";
 import { showToast } from "@/lib/adminToast";
 
 export default function AdminCipVideoForm() {
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const [videoUrl, setVideoUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/settings/cip-video")
       .then((r) => r.json())
-      .then((d) => setVideoUrl(d.videoUrl ?? ""))
+      .then((d) => setVideoUrl(d.videoUrl ?? null))
       .catch((e) => setError(e instanceof Error ? e.message : "خطا در بارگذاری"))
       .finally(() => setLoading(false));
   }, []);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
+  async function uploadVideo(file: File) {
+    setUploading(true);
     setError("");
     try {
-      const res = await fetch("/api/admin/settings/cip-video", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoUrl: videoUrl.trim() || null }),
-      });
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/settings/cip-video/upload", { method: "POST", body: formData });
       const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.videoUrl) throw new Error(data?.error || "لینک ویدیو ذخیره نشد");
+      if (!res.ok) throw new Error(data?.error || "خطا در بارگذاری ویدیو");
       setVideoUrl(data.videoUrl);
-      showToast("ویدیوی CIP ذخیره شد", "success");
+      showToast("ویدیوی معرفی CIP روی سرور بارگذاری شد", "success");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "خطا در ذخیره‌سازی");
+      setError(e instanceof Error ? e.message : "خطا در بارگذاری ویدیو");
     } finally {
-      setSaving(false);
+      setUploading(false);
     }
   }
 
   if (loading) return <p className="search-empty">در حال بارگذاری...</p>;
 
   return (
-    <form onSubmit={onSubmit} className="form-section fade-in">
-      <h2>ویدیوی CIP</h2>
+    <section className="form-section fade-in">
+      <h2>ویدیوی معرفی CIP</h2>
       {error && <p className="my-ad__error" style={{ marginBottom: 12 }}>{error}</p>}
       <div className="form-group">
-        <label>لینک ویدیوی آپارات (اختیاری)</label>
+        <label>بارگذاری مستقیم ویدیو</label>
         <input
-          type="text"
-          dir="ltr"
-          value={videoUrl}
-          onChange={(e) => setVideoUrl(e.target.value)}
-          placeholder="https://www.aparat.com/v/xxxxx"
+          type="file"
+          accept="video/mp4,video/webm,video/quicktime"
+          disabled={uploading}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) uploadVideo(file);
+            e.currentTarget.value = "";
+          }}
         />
-        <small>ویدیوی آپارات بخش CIP را وارد کنید.</small>
+        <small>MP4، WebM یا MOV تا ۱۰۰ مگابایت. ویدیو روی سرور ذخیره و در صفحهٔ CIP نمایش داده می‌شود.</small>
       </div>
-      <div className="admin-actions-bar">
-        <button type="submit" className="btn-primary" disabled={saving}>
-          {saving ? "در حال ذخیره..." : "ذخیره"}
-        </button>
-      </div>
-    </form>
+      {uploading && <p className="form-hint">در حال بارگذاری و انتشار ویدیو...</p>}
+      {videoUrl && <p className="form-hint">ویدیوی معرفی فعلی ثبت شده است.</p>}
+    </section>
   );
 }
