@@ -15,7 +15,7 @@ export default function AdminCipFreePublishForm({
   const router = useRouter();
   const [planId, setPlanId] = useState("");
   const [advertisementId, setAdvertisementId] = useState("");
-  const [videoUrl, setVideoUrl] = useState("");
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -27,14 +27,23 @@ export default function AdminCipFreePublishForm({
       const res = await fetch("/api/admin/cip-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId, advertisementId, videoUrl: videoUrl.trim() || null }),
+        body: JSON.stringify({ planId, advertisementId }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error(data?.error || "خطا در ثبت درخواست CIP");
-      showToast(videoUrl.trim() ? "آگهی CIP بدون پرداخت منتشر شد" : "درخواست CIP بدون پرداخت ثبت شد", "success");
+
+      if (videoFile) {
+        const formData = new FormData();
+        formData.append("file", videoFile);
+        const uploadRes = await fetch(`/api/admin/cip-requests/${data.request.id}/video`, { method: "POST", body: formData });
+        const uploadData = await uploadRes.json().catch(() => null);
+        if (!uploadRes.ok) throw new Error(uploadData?.error || "خطا در بارگذاری ویدیو");
+      }
+
+      showToast(videoFile ? "ویدیو بارگذاری و آگهی CIP منتشر شد" : "درخواست CIP بدون پرداخت ثبت شد", "success");
       setPlanId("");
       setAdvertisementId("");
-      setVideoUrl("");
+      setVideoFile(null);
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "خطا در ثبت درخواست CIP");
@@ -50,7 +59,7 @@ export default function AdminCipFreePublishForm({
       <h2>انتشار آگهی CIP بدون پرداخت (مدیر کل)</h2>
       <p className="form-hint">
         این بخش فقط برای مدیر کل است. آگهی انتخاب‌شده بدون طی کردن درگاه پرداخت، مستقیماً به‌عنوان
-        «پرداخت‌شده» ثبت می‌شود و در صورت ثبت لینک آپارات، همان لحظه در صفحهٔ عمومی CIP منتشر می‌شود.
+        «پرداخت‌شده» ثبت می‌شود. با انتخاب ویدیو، همان ویدیوی عمودی برای این آگهی بارگذاری و در صفحهٔ عمومی CIP منتشر می‌شود.
       </p>
       {error && <p className="my-ad__error" style={{ marginBottom: 12 }}>{error}</p>}
 
@@ -79,15 +88,14 @@ export default function AdminCipFreePublishForm({
       </div>
 
       <div className="form-group">
-        <label>لینک ویدیوی آپارات (اختیاری)</label>
+        <label>ویدیوی آگهی (اختیاری)</label>
         <input
-          type="url"
-          dir="ltr"
-          placeholder="https://www.aparat.com/v/xxxxx"
-          value={videoUrl}
-          onChange={(e) => setVideoUrl(e.target.value)}
+          type="file"
+          accept="video/mp4,video/webm,video/quicktime"
+          disabled={saving}
+          onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
         />
-        <small>اگر وارد شود، آگهی همان لحظه منتشر می‌شود؛ در غیر این صورت در مرحلهٔ «پرداخت‌شده» می‌ماند.</small>
+        <small>MP4، WebM یا MOV تا ۱۰۰ مگابایت. با ثبت فرم، ویدیو مستقیماً برای همین آگهی بارگذاری و منتشر می‌شود.</small>
       </div>
 
       <div className="admin-actions-bar">

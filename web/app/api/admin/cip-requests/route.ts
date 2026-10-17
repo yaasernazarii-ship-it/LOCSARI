@@ -5,7 +5,6 @@ import { getUserRoleKeys } from "@/lib/rbac";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { logAdminAction } from "@/lib/audit";
 import { parseId } from "@/lib/validation";
-import { isValidAparatUrl } from "@/lib/aparat";
 
 // ثبت درخواست CIP بدون پرداخت — فقط مدیر کل.
 // درخواست مستقیماً با وضعیت «پرداخت‌شده» ساخته می‌شود و هیچ رکوردی در cip_payment_orders ثبت نمی‌شود،
@@ -33,11 +32,6 @@ export async function POST(req: NextRequest) {
   ]);
   if (!plan || !advertisement) return NextResponse.json({ error: "پلن یا آگهی انتخاب‌شده یافت نشد" }, { status: 404 });
 
-  const videoUrl = typeof body.videoUrl === "string" ? body.videoUrl.trim() : "";
-  if (videoUrl && !isValidAparatUrl(videoUrl)) {
-    return NextResponse.json({ error: "لینک ویدیو باید یک آدرس معتبر آپارات باشد" }, { status: 400 });
-  }
-
   const request = await db
     .insertInto("cip_requests")
     .values({
@@ -45,8 +39,8 @@ export async function POST(req: NextRequest) {
       advertisement_id: advertisement.id,
       plan_id: plan.id,
       price: Number(plan.price),
-      status: videoUrl ? "published" : "paid",
-      video_url: videoUrl || null,
+      status: "paid",
+      video_url: null,
     })
     .returningAll()
     .executeTakeFirstOrThrow();
