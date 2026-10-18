@@ -3,11 +3,27 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/apiAuth";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { logAdminAction } from "@/lib/audit";
-import { parseId } from "@/lib/validation";
+import { parseId, AdvertisementStatus } from "@/lib/validation";
+import { canTransition, transitionAdvertisementStatus } from "@/lib/advertisementWorkflow";
 import { isValidAparatUrl } from "@/lib/aparat";
 import { storage } from "@/lib/storage";
 
 const STATUSES = ["awaiting_payment", "paid", "contacted", "scheduled", "filmed", "published", "cancelled"];
+
+async function archiveAdvertisement(advertisementId: number, userId: number): Promise<string | null> {
+  const advertisement = await db.selectFrom("advertisements").select(["id", "status"]).where("id", "=", advertisementId).executeTakeFirst();
+  if (!advertisement) return "آگهی اصلی یافت نشد";
+  if (advertisement.status === "archived") return null;
+  if (!canTransition(advertisement.status as AdvertisementStatus, "archived")) return "آگهی اصلی قابل آرشیو نیست";
+  await transitionAdvertisementStatus(db, {
+    advertisementId: advertisement.id,
+    from: advertisement.status as AdvertisementStatus,
+    to: "archived",
+    changedBy: userId,
+    reason: "cip-archived",
+  });
+  return null;
+}
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const auth = await requirePermission("cip.manage");
@@ -16,7 +32,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
   const id = parseId(params.id);
   if (!id) return NextResponse.json({ error: "شناسه نامعتبر است" }, { status: 400 });
-  const existing = await db.selectFrom("cip_requests").select(["id", "status", "video_url"]).where("id", "=", id).executeTakeFirst();
+  const existing = await db.selectFrom("cip_requests").select(["id", "status", "video_url", "advertisement_id"]).where("id", "=", id).executeTakeFirst();
   if (!existing) return NextResponse.json({ error: "درخواست یافت نشد" }, { status: 404 });
 
   const body = await req.json().catch(() => null);
@@ -55,6 +71,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     }
   }
   if (Object.keys(update).length === 0) return NextResponse.json({ error: "هیچ فیلدی برای به‌روزرسانی ارسال نشده" }, { status: 400 });
+  if (update.status === "cancelled") {
+    const archiveError = await archiveAdvertisement(existing.advertisement_id, auth.user.id);
+    if (archiveError) return NextResponse.json({ error: archiveError }, { status: 409 });
+  }
   update.updated_at = new Date().toISOString();
 
   const request = await db.updateTable("cip_requests").set(update).where("id", "=", id).returningAll().executeTakeFirstOrThrow();
@@ -69,12 +89,14 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
   const id = parseId(params.id);
   if (!id) return NextResponse.json({ error: "شناسه نامعتبر است" }, { status: 400 });
-  const request = await db.selectFrom("cip_requests").select(["id", "video_url"]).where("id", "=", id).executeTakeFirst();
+  const request = await db.selectFrom("cip_requests").select(["id", "video_url", "advertisement_id"]).where("id", "=", id).executeTakeFirst();
   if (!request) return NextResponse.json({ error: "درخواست یافت نشد" }, { status: 404 });
 
   const payment = await db.selectFrom("cip_payment_orders").select("id").where("cip_request_id", "=", id).executeTakeFirst();
   if (payment) return NextResponse.json({ error: "درخواست دارای سابقهٔ پرداخت است و فقط می‌تواند آرشیو شود" }, { status: 409 });
 
+  const archiveError = await archiveAdvertisement(request.advertisement_id, auth.user.id);
+  if (archiveError) return NextResponse.json({ error: archiveError }, { status: 409 });
   await db.deleteFrom("cip_requests").where("id", "=", id).executeTakeFirst();
   const key = request.video_url?.startsWith(`/uploads/cip/${id}/`) ? request.video_url.slice("/uploads/".length) : null;
   if (key) await storage.delete(key);

@@ -76,7 +76,7 @@ export default function AdminCipRequestRow({
   }
 
   async function archiveRequest() {
-    if (!window.confirm("این آگهی از بخش CIP خارج و آرشیو می‌شود. ادامه می‌دهید؟")) return;
+    if (!window.confirm("این آگهی از سایت و بخش CIP آرشیو می‌شود. ادامه می‌دهید؟")) return;
     setSaving(true);
     setError("");
     try {
@@ -87,7 +87,7 @@ export default function AdminCipRequestRow({
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error(data?.error || "خطا در آرشیو آگهی CIP");
-      showToast("آگهی از بخش CIP آرشیو شد", "success");
+      showToast("آگهی از سایت و بخش CIP آرشیو شد", "success");
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "خطا در آرشیو آگهی CIP");
@@ -97,7 +97,7 @@ export default function AdminCipRequestRow({
   }
 
   async function deleteRequest() {
-    if (!window.confirm("درخواست CIP و ویدیوی آن حذف می‌شود. این عمل قابل بازگشت نیست. ادامه می‌دهید؟")) return;
+    if (!window.confirm("درخواست CIP و ویدیوی آن حذف، و آگهی اصلی از سایت آرشیو می‌شود. این عمل قابل بازگشت نیست. ادامه می‌دهید؟")) return;
     setSaving(true);
     setError("");
     try {
