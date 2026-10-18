@@ -17,6 +17,7 @@ export default function AdminCipFreePublishForm({
   const [advertisementId, setAdvertisementId] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [error, setError] = useState("");
 
   async function onSubmit(e: React.FormEvent) {
@@ -34,11 +35,29 @@ export default function AdminCipFreePublishForm({
       if (!data?.request?.id || typeof data.request.id !== "number") throw new Error("ثبت درخواست CIP ناموفق بود");
 
       if (videoFile) {
-        const formData = new FormData();
-        formData.append("file", videoFile);
-        const uploadRes = await fetch(`/api/admin/cip-requests/${data.request.id}/video`, { method: "POST", body: formData });
-        const uploadData = await uploadRes.json().catch(() => null);
-        if (!uploadRes.ok) throw new Error(uploadData?.error || "خطا در بارگذاری ویدیو");
+        const uploadData = await new Promise<{ request: { id: number } }>((resolve, reject) => {
+          const request = new XMLHttpRequest();
+          request.open("POST", `/api/admin/cip-requests/${data.request.id}/video`);
+          request.timeout = 10 * 60 * 1000;
+          request.upload.onprogress = (event) => {
+            if (event.lengthComputable) setUploadProgress(Math.round((event.loaded / event.total) * 100));
+          };
+          request.onload = () => {
+            try {
+              const response = JSON.parse(request.responseText || "null");
+              if (request.status >= 200 && request.status < 300) resolve(response);
+              else reject(new Error(response?.error || "خطا در بارگذاری ویدیو"));
+            } catch {
+              reject(new Error("پاسخ نامعتبر از سرور دریافت شد"));
+            }
+          };
+          request.onerror = () => reject(new Error("ارتباط با سرور هنگام بارگذاری قطع شد"));
+          request.ontimeout = () => reject(new Error("بارگذاری ویدیو بیش از حد طول کشید"));
+          const formData = new FormData();
+          formData.append("file", videoFile);
+          request.send(formData);
+        });
+        if (!uploadData.request?.id) throw new Error("انتشار ویدیوی آگهی ناموفق بود");
       }
 
       showToast(videoFile ? "ویدیو بارگذاری و آگهی CIP منتشر شد" : "درخواست CIP بدون پرداخت ثبت شد", "success");
@@ -51,6 +70,7 @@ export default function AdminCipFreePublishForm({
       setError(e instanceof Error ? e.message : "خطا در ثبت درخواست CIP");
     } finally {
       setSaving(false);
+      setUploadProgress(null);
     }
   }
 
@@ -103,7 +123,7 @@ export default function AdminCipFreePublishForm({
 
       <div className="admin-actions-bar">
         <button type="submit" className="btn-primary" disabled={saving || !canSubmit}>
-          {saving ? "در حال ثبت و انتشار..." : videoFile ? "ثبت و انتشار آگهی" : "ثبت درخواست CIP"}
+          {saving ? `در حال ثبت و انتشار${uploadProgress !== null ? ` (${uploadProgress}٪)` : ""}...` : videoFile ? "ثبت و انتشار آگهی" : "ثبت درخواست CIP"}
         </button>
       </div>
     </form>

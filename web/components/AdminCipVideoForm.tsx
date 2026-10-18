@@ -8,6 +8,7 @@ export default function AdminCipVideoForm() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [inputKey, setInputKey] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
@@ -24,11 +25,28 @@ export default function AdminCipVideoForm() {
     setUploading(true);
     setError("");
     try {
-      const formData = new FormData();
-      formData.append("file", videoFile);
-      const res = await fetch("/api/admin/settings/cip-video/upload", { method: "POST", body: formData });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.error || "خطا در بارگذاری ویدیو");
+      const data = await new Promise<{ videoUrl: string }>((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open("POST", "/api/admin/settings/cip-video/upload");
+        request.timeout = 10 * 60 * 1000;
+        request.upload.onprogress = (event) => {
+          if (event.lengthComputable) setUploadProgress(Math.round((event.loaded / event.total) * 100));
+        };
+        request.onload = () => {
+          try {
+            const response = JSON.parse(request.responseText || "null");
+            if (request.status >= 200 && request.status < 300) resolve(response);
+            else reject(new Error(response?.error || "خطا در بارگذاری ویدیو"));
+          } catch {
+            reject(new Error("پاسخ نامعتبر از سرور دریافت شد"));
+          }
+        };
+        request.onerror = () => reject(new Error("ارتباط با سرور هنگام بارگذاری قطع شد"));
+        request.ontimeout = () => reject(new Error("بارگذاری ویدیو بیش از حد طول کشید"));
+        const formData = new FormData();
+        formData.append("file", videoFile);
+        request.send(formData);
+      });
       setVideoUrl(data.videoUrl);
       setVideoFile(null);
       setInputKey((key) => key + 1);
@@ -37,6 +55,7 @@ export default function AdminCipVideoForm() {
       setError(e instanceof Error ? e.message : "خطا در بارگذاری ویدیو");
     } finally {
       setUploading(false);
+      setUploadProgress(null);
     }
   }
 
@@ -59,7 +78,7 @@ export default function AdminCipVideoForm() {
       </div>
       <div className="admin-actions-bar">
         <button type="button" className="btn-primary" disabled={uploading || !videoFile} onClick={uploadVideo}>
-          {uploading ? "در حال بارگذاری و انتشار..." : "ثبت و انتشار ویدیوی معرفی"}
+          {uploading ? `در حال بارگذاری و انتشار${uploadProgress !== null ? ` (${uploadProgress}٪)` : ""}...` : "ثبت و انتشار ویدیوی معرفی"}
         </button>
       </div>
       {videoFile && <p className="form-hint">فایل انتخاب‌شده: {videoFile.name}</p>}
