@@ -97,12 +97,13 @@ export default function AdminCipFreePublishForm({
           disabled={saving}
           onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
         />
-        <small>MP4، WebM یا MOV تا ۱۰۰ مگابایت. با ثبت فرم، ویدیو مستقیماً برای همین آگهی بارگذاری و منتشر می‌شود.</small>
+        <small>MP4، WebM یا MOV تا ۱۰۰ مگابایت. ابتدا فایل را انتخاب کنید، سپس دکمهٔ ثبت و انتشار را بزنید.</small>
       </div>
+      {videoFile && <p className="form-hint">فایل انتخاب‌شده: {videoFile.name}</p>}
 
       <div className="admin-actions-bar">
         <button type="submit" className="btn-primary" disabled={saving || !canSubmit}>
-          {saving ? "در حال ثبت..." : "ثبت بدون پرداخت"}
+          {saving ? "در حال ثبت و انتشار..." : videoFile ? "ثبت و انتشار آگهی" : "ثبت درخواست CIP"}
         </button>
       </div>
     </form>

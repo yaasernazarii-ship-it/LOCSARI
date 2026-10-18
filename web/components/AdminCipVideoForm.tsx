@@ -5,6 +5,8 @@ import { showToast } from "@/lib/adminToast";
 
 export default function AdminCipVideoForm() {
   const [loading, setLoading] = useState(true);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [inputKey, setInputKey] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -17,17 +19,20 @@ export default function AdminCipVideoForm() {
       .finally(() => setLoading(false));
   }, []);
 
-  async function uploadVideo(file: File) {
+  async function uploadVideo() {
+    if (!videoFile) return;
     setUploading(true);
     setError("");
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", videoFile);
       const res = await fetch("/api/admin/settings/cip-video/upload", { method: "POST", body: formData });
       const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error(data?.error || "خطا در بارگذاری ویدیو");
       setVideoUrl(data.videoUrl);
-      showToast("ویدیوی معرفی CIP روی سرور بارگذاری شد", "success");
+      setVideoFile(null);
+      setInputKey((key) => key + 1);
+      showToast("ویدیوی معرفی CIP روی سرور بارگذاری و منتشر شد", "success");
     } catch (e) {
       setError(e instanceof Error ? e.message : "خطا در بارگذاری ویدیو");
     } finally {
@@ -44,19 +49,21 @@ export default function AdminCipVideoForm() {
       <div className="form-group">
         <label>بارگذاری مستقیم ویدیو</label>
         <input
+          key={inputKey}
           type="file"
           accept="video/mp4,video/webm,video/quicktime"
           disabled={uploading}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) uploadVideo(file);
-            e.currentTarget.value = "";
-          }}
+          onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
         />
-        <small>MP4، WebM یا MOV تا ۱۰۰ مگابایت. ویدیو روی سرور ذخیره و در صفحهٔ CIP نمایش داده می‌شود.</small>
+        <small>MP4، WebM یا MOV تا ۱۰۰ مگابایت. ابتدا فایل را انتخاب کنید، سپس دکمهٔ ثبت و انتشار را بزنید.</small>
       </div>
-      {uploading && <p className="form-hint">در حال بارگذاری و انتشار ویدیو...</p>}
-      {videoUrl && <p className="form-hint">ویدیوی معرفی فعلی ثبت شده است.</p>}
+      <div className="admin-actions-bar">
+        <button type="button" className="btn-primary" disabled={uploading || !videoFile} onClick={uploadVideo}>
+          {uploading ? "در حال بارگذاری و انتشار..." : "ثبت و انتشار ویدیوی معرفی"}
+        </button>
+      </div>
+      {videoFile && <p className="form-hint">فایل انتخاب‌شده: {videoFile.name}</p>}
+      {videoUrl && <p className="form-hint">ویدیوی معرفی فعلی ثبت و منتشر شده است.</p>}
     </section>
   );
 }
