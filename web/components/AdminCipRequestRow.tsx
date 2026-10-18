@@ -75,6 +75,44 @@ export default function AdminCipRequestRow({
     }
   }
 
+  async function archiveRequest() {
+    if (!window.confirm("این آگهی از بخش CIP خارج و آرشیو می‌شود. ادامه می‌دهید؟")) return;
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/admin/cip-requests/${requestId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || "خطا در آرشیو آگهی CIP");
+      showToast("آگهی از بخش CIP آرشیو شد", "success");
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "خطا در آرشیو آگهی CIP");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deleteRequest() {
+    if (!window.confirm("درخواست CIP و ویدیوی آن حذف می‌شود. این عمل قابل بازگشت نیست. ادامه می‌دهید؟")) return;
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/admin/cip-requests/${requestId}`, { method: "DELETE" });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || "خطا در حذف درخواست CIP");
+      showToast("درخواست CIP حذف شد", "success");
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "خطا در حذف درخواست CIP");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <>
       <button type="button" className="btn-secondary admin-header-btn" onClick={() => setOpen((v) => !v)}>
@@ -108,6 +146,10 @@ export default function AdminCipRequestRow({
           <button type="button" className="btn-primary admin-header-btn" disabled={saving} onClick={save}>
             {saving ? "در حال ذخیره..." : "ذخیره"}
           </button>
+          <div className="admin-actions-bar" style={{ marginTop: 10 }}>
+            <button type="button" className="btn-secondary admin-header-btn" disabled={saving} onClick={archiveRequest}>آرشیو از CIP</button>
+            <button type="button" className="btn-danger admin-header-btn" disabled={saving} onClick={deleteRequest}>حذف از CIP</button>
+          </div>
           <div className="form-group" style={{ marginTop: 12 }}>
             <label>بارگذاری مستقیم ویدیوی عمودی</label>
             <input
