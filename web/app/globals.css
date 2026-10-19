@@ -3164,7 +3164,7 @@ a.contact-info-card:hover {
 
 .cip-introduction { max-width: 760px; padding-top: 26px; padding-bottom: 18px; }
 .cip-eyebrow { color: #b98536; font-size: .7rem; font-weight: 800; letter-spacing: .16em; }
-.cip-introduction__video { border: 1px solid #ead7b6; border-radius: 18px; box-shadow: 0 18px 35px rgba(39, 30, 18, .14); overflow: hidden; }
+.cip-introduction__video { width: min(100%, 360px); margin: 0 auto; border: 1px solid #ead7b6; border-radius: 18px; box-shadow: 0 18px 35px rgba(39, 30, 18, .14); overflow: hidden; background: #080d18; }
 .cip-introduction__video iframe { aspect-ratio: 16 / 9; border: 0; display: block; width: 100%; }
 .cip-showcase, .cip-plans { padding-top: 42px; }
 .cip-plans { background: radial-gradient(circle at 10% 10%, rgba(58, 129, 183, .26), transparent 35%), radial-gradient(circle at 90% 85%, rgba(208, 159, 73, .2), transparent 34%), linear-gradient(135deg, #0b1c37, #172c4a); border-radius: 30px; margin-top: 28px; padding: 52px 38px; }
@@ -3423,11 +3423,16 @@ a.contact-info-card:hover {
 
 .cip-portrait-video {
   display: block;
-  width: min(100%, 430px);
-  max-height: 78vh;
+  width: min(100%, 43.875vh, 360px);
+  height: min(78vh, 640px);
+  aspect-ratio: 9 / 16;
   margin: 0 auto;
   border-radius: 16px;
   background: #080d18;
-  object-fit: contain;
+  object-fit: cover;
   box-shadow: 0 14px 34px rgba(8, 13, 24, 0.18);
+}
+
+@media (max-width: 680px) {
+  .cip-portrait-video { width: min(100%, 41.625vh, 360px); height: min(74vh, 640px); }
 }
