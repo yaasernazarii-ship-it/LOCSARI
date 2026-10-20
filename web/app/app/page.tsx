@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: "نسخهٔ اندروید و راهنمای نصب وب‌اپلیکیشن لوکیشن ساری روی آیفون.",
 };
 
+const androidDownloadUrl = "https://github.com/yaasernazarii-ship-it/LOCSARI/releases/download/1.0.0/locsarii.apk";
+
 export default function AppDownloadPage() {
   return (
     <div className="app-download-page">
@@ -21,10 +23,12 @@ export default function AppDownloadPage() {
           <div className="app-download-card__icon"><Download size={26} /></div>
           <div>
             <h2>اندروید</h2>
-            <p>نسخهٔ APK پس از انتشار رسمی از همین صفحه قابل دریافت خواهد بود.</p>
+            <p>فایل APK رسمی را مستقیم دانلود و نصب کنید.</p>
           </div>
-          <span className="app-download-button app-download-button--disabled" aria-disabled="true">به‌زودی برای دانلود</span>
-          <p className="app-download-card__note">تا انتشار نسخهٔ APK، می‌توانید سایت را از مرورگر گوشی به صفحهٔ اصلی اضافه کنید.</p>
+          <a className="app-download-button app-download-button--primary" href={androidDownloadUrl}>
+            <Download size={19} /> دانلود APK اندروید
+          </a>
+          <p className="app-download-card__note">برای نصب، در صورت نیاز اجازهٔ نصب از منابع ناشناس را در تنظیمات گوشی فعال کنید.</p>
         </article>
 
         <article className="app-download-card">
