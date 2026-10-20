@@ -25,7 +25,12 @@ export default function AppDownloadPage() {
             <h2>اندروید</h2>
             <p>فایل APK رسمی را مستقیم دانلود و نصب کنید.</p>
           </div>
-          <a className="app-download-button app-download-button--primary" href={androidDownloadUrl}>
+          <a
+            className="app-download-button app-download-button--primary"
+            href={androidDownloadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Download size={19} /> دانلود APK اندروید
           </a>
           <p className="app-download-card__note">برای نصب، در صورت نیاز اجازهٔ نصب از منابع ناشناس را در تنظیمات گوشی فعال کنید.</p>
