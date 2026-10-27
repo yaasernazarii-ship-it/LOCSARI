@@ -932,10 +932,10 @@ export default function PropertyAdForm(props: Props) {
                   <label>سال ساخت</label>
                   <select value={base.builtYear} onChange={(e) => updateBase({ builtYear: e.target.value })}>
                     <option value="">انتخاب نشده</option>
-                    <option value="1369">قبل از ۱۳۷۰</option>
                     {Array.from({ length: Math.trunc(CURRENT_PERSIAN_YEAR) - 1369 }, (_, i) => Math.trunc(CURRENT_PERSIAN_YEAR) - i).map((year) => (
                       <option key={year} value={year}>{formatPersianInteger(year)}</option>
                     ))}
+                    <option value="1369">قبل از ۱۳۷۰</option>
                   </select>
                 </div>
               )}
