@@ -808,7 +808,9 @@ export default function PropertyAdForm(props: Props) {
             <select
               value={base.categoryId}
               onChange={(e) => {
-                updateBase({ categoryId: e.target.value, subcategoryId: "" });
+                const categoryId = e.target.value;
+                const category = categories.find((item) => item.id === Number(categoryId));
+                updateBase({ categoryId, subcategoryId: "", title: category?.name ?? "" });
                 setAttrs({});
               }}
             >
