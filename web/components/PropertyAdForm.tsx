@@ -177,6 +177,25 @@ function isDuplicateBaseField(field: CategoryField): boolean {
   return field.key === "sale_sakht" || field.key === "built_year";
 }
 
+const CATEGORY_BASE_FIELD_SETTINGS: Record<string, {
+  areaLabel: string;
+  showBuiltArea: boolean;
+  showBedrooms: boolean;
+  showBuiltYear: boolean;
+  showFloor: boolean;
+}> = {
+  "kharid-forosh-vila": { areaLabel: "متراژ زمین (متر مربع)", showBuiltArea: true, showBedrooms: true, showBuiltYear: true, showFloor: true },
+  "rahn-ejare-vila": { areaLabel: "متراژ زمین (متر مربع)", showBuiltArea: true, showBedrooms: true, showBuiltYear: true, showFloor: true },
+  "rahn-ejare-khane-apartman": { areaLabel: "متراژ (متر مربع)", showBuiltArea: true, showBedrooms: true, showBuiltYear: true, showFloor: true },
+  "kharid-forosh-khane-apartman": { areaLabel: "متراژ (متر مربع)", showBuiltArea: true, showBedrooms: true, showBuiltYear: true, showFloor: true },
+  "ejare-kutahmoddat-vila-suite": { areaLabel: "متراژ اقامتگاه (متر مربع)", showBuiltArea: true, showBedrooms: true, showBuiltYear: false, showFloor: false },
+  "rahn-ejare-edari-tejari-sanati": { areaLabel: "متراژ (متر مربع)", showBuiltArea: false, showBedrooms: false, showBuiltYear: true, showFloor: true },
+  "kharid-forosh-edari-tejari-sanati": { areaLabel: "متراژ (متر مربع)", showBuiltArea: false, showBedrooms: false, showBuiltYear: true, showFloor: true },
+  "zamin-bagh": { areaLabel: "متراژ زمین (متر مربع)", showBuiltArea: false, showBedrooms: false, showBuiltYear: false, showFloor: false },
+  "pishforosh-mosharekat-sakht": { areaLabel: "متراژ واحد (متر مربع)", showBuiltArea: true, showBedrooms: true, showBuiltYear: false, showFloor: true },
+  "saeer-amlak": { areaLabel: "متراژ (متر مربع)", showBuiltArea: false, showBedrooms: false, showBuiltYear: false, showFloor: false },
+};
+
 function formatPriceWithSlashes(value: string): string {
   const digits = value
     .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
@@ -795,6 +814,7 @@ export default function PropertyAdForm(props: Props) {
   const topCategories = categories.filter((c) => !c.parent_id);
   const subcategories = base.categoryId ? categories.filter((c) => c.parent_id === Number(base.categoryId)) : [];
   const selectedCategory = categories.find((c) => c.id === Number(base.categoryId));
+  const baseFieldSettings = selectedCategory ? CATEGORY_BASE_FIELD_SETTINGS[selectedCategory.slug] : null;
   const filteredNeighborhoods = neighborhoods.filter((n) => normalizePersian(n.name).includes(normalizePersian(locationQuery)));
   const categoryTransactionType = selectedCategory ? CATEGORY_TRANSACTION_TYPES[selectedCategory.slug] : undefined;
 
@@ -882,39 +902,51 @@ export default function PropertyAdForm(props: Props) {
           <input type="text" value={base.title} onChange={(e) => updateBase({ title: e.target.value })} maxLength={200} />
         </div>
         <div className="form-grid">
-          <div className="form-group">
-            <label>متراژ (متر مربع)</label>
-            <input type="number" min={0} value={base.area} onChange={(e) => updateBase({ area: e.target.value })} />
-            {measurementInWords(base.area) && <small className="number-in-words">{measurementInWords(base.area)} متر مربع</small>}
-          </div>
-          <div className="form-group">
-            <label>زیربنا (متر مربع)</label>
-            <input type="number" min={0} value={base.builtArea} onChange={(e) => updateBase({ builtArea: e.target.value })} />
-            {measurementInWords(base.builtArea) && <small className="number-in-words">{measurementInWords(base.builtArea)} متر مربع</small>}
-          </div>
-          <div className="form-group">
-            <label>تعداد اتاق خواب</label>
-            <select value={base.bedrooms} onChange={(e) => updateBase({ bedrooms: e.target.value })}>
-              <option value="">انتخاب کنید</option>
-              {Array.from({ length: 5 }, (_, index) => index + 1).map((bedrooms) => (
-                <option key={bedrooms} value={bedrooms}>{bedrooms.toLocaleString("fa-IR")}</option>
-              ))}
-            </select>
-          </div>
-          <div className="form-group">
-            <label>سال ساخت</label>
-            <select value={base.builtYear} onChange={(e) => updateBase({ builtYear: e.target.value })}>
-              <option value="">انتخاب نشده</option>
-              <option value="1369">قبل از ۱۳۷۰</option>
-              {Array.from({ length: Math.trunc(CURRENT_PERSIAN_YEAR) - 1369 }, (_, i) => Math.trunc(CURRENT_PERSIAN_YEAR) - i).map((year) => (
-                <option key={year} value={year}>{formatPersianInteger(year)}</option>
-              ))}
-            </select>
-          </div>
-          <div className="form-group">
-            <label>طبقه</label>
-            <input type="number" min={-2} max={30} value={base.floor} onChange={(e) => updateBase({ floor: e.target.value })} />
-          </div>
+          {baseFieldSettings && (
+            <>
+              <div className="form-group">
+                <label>{baseFieldSettings.areaLabel}</label>
+                <input type="number" min={0} value={base.area} onChange={(e) => updateBase({ area: e.target.value })} />
+                {measurementInWords(base.area) && <small className="number-in-words">{measurementInWords(base.area)} متر مربع</small>}
+              </div>
+              {baseFieldSettings.showBuiltArea && (
+                <div className="form-group">
+                  <label>زیربنا (متر مربع)</label>
+                  <input type="number" min={0} value={base.builtArea} onChange={(e) => updateBase({ builtArea: e.target.value })} />
+                  {measurementInWords(base.builtArea) && <small className="number-in-words">{measurementInWords(base.builtArea)} متر مربع</small>}
+                </div>
+              )}
+              {baseFieldSettings.showBedrooms && (
+                <div className="form-group">
+                  <label>تعداد اتاق خواب</label>
+                  <select value={base.bedrooms} onChange={(e) => updateBase({ bedrooms: e.target.value })}>
+                    <option value="">انتخاب کنید</option>
+                    {Array.from({ length: 5 }, (_, index) => index + 1).map((bedrooms) => (
+                      <option key={bedrooms} value={bedrooms}>{bedrooms.toLocaleString("fa-IR")}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {baseFieldSettings.showBuiltYear && (
+                <div className="form-group">
+                  <label>سال ساخت</label>
+                  <select value={base.builtYear} onChange={(e) => updateBase({ builtYear: e.target.value })}>
+                    <option value="">انتخاب نشده</option>
+                    <option value="1369">قبل از ۱۳۷۰</option>
+                    {Array.from({ length: Math.trunc(CURRENT_PERSIAN_YEAR) - 1369 }, (_, i) => Math.trunc(CURRENT_PERSIAN_YEAR) - i).map((year) => (
+                      <option key={year} value={year}>{formatPersianInteger(year)}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {baseFieldSettings.showFloor && (
+                <div className="form-group">
+                  <label>طبقه</label>
+                  <input type="number" min={-2} max={30} value={base.floor} onChange={(e) => updateBase({ floor: e.target.value })} />
+                </div>
+              )}
+            </>
+          )}
           <div className="form-group">
             <label>دقت مکان روی نقشه</label>
             <select value={base.locationPrecision} onChange={(e) => updateBase({ locationPrecision: e.target.value })}>
