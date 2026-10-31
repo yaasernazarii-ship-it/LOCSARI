@@ -6,8 +6,6 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SearchSort, SearchResultItem } from "@/lib/search/types";
-import { SORT_LABELS, RENT_BASED_TRANSACTION_TYPES } from "@/lib/labels";
-import { TransactionType } from "@/lib/validation";
 import AdCard from "@/components/AdCard";
 import PropertyAssistant from "@/components/PropertyAssistant";
 
@@ -46,12 +44,6 @@ interface FormState {
   districtId: string;
   marketZoneId: string;
   neighborhoodId: string;
-  minPrice: string;
-  maxPrice: string;
-  minDeposit: string;
-  maxDeposit: string;
-  minMonthlyRent: string;
-  maxMonthlyRent: string;
   minArea: string;
   maxArea: string;
   bedrooms: string;
@@ -67,12 +59,6 @@ const NUMERIC_KEYS = [
   "districtId",
   "marketZoneId",
   "neighborhoodId",
-  "minPrice",
-  "maxPrice",
-  "minDeposit",
-  "maxDeposit",
-  "minMonthlyRent",
-  "maxMonthlyRent",
   "minArea",
   "maxArea",
   "bedrooms",
@@ -81,6 +67,12 @@ const NUMERIC_KEYS = [
 ] as const;
 
 const KNOWN_KEYS = new Set<string>(["q", "sort", "page", "limit", "transactionType", ...NUMERIC_KEYS]);
+const PROPERTY_SORT_OPTIONS = ["newest", "price_asc", "price_desc"] as const;
+const PROPERTY_SORT_LABELS: Record<(typeof PROPERTY_SORT_OPTIONS)[number], string> = {
+  newest: "جدیدترین",
+  price_asc: "ارزان‌ترین",
+  price_desc: "گران‌ترین",
+};
 
 function emptyForm(): FormState {
   return {
@@ -91,12 +83,6 @@ function emptyForm(): FormState {
     districtId: "",
     marketZoneId: "",
     neighborhoodId: "",
-    minPrice: "",
-    maxPrice: "",
-    minDeposit: "",
-    maxDeposit: "",
-    minMonthlyRent: "",
-    maxMonthlyRent: "",
     minArea: "",
     maxArea: "",
     bedrooms: "",
@@ -132,12 +118,6 @@ function buildQueryString(form: FormState, page: number): string {
   if (form.districtId) p.set("districtId", form.districtId);
   if (form.marketZoneId) p.set("marketZoneId", form.marketZoneId);
   if (form.neighborhoodId) p.set("neighborhoodId", form.neighborhoodId);
-  if (form.minPrice) p.set("minPrice", form.minPrice);
-  if (form.maxPrice) p.set("maxPrice", form.maxPrice);
-  if (form.minDeposit) p.set("minDeposit", form.minDeposit);
-  if (form.maxDeposit) p.set("maxDeposit", form.maxDeposit);
-  if (form.minMonthlyRent) p.set("minMonthlyRent", form.minMonthlyRent);
-  if (form.maxMonthlyRent) p.set("maxMonthlyRent", form.maxMonthlyRent);
   if (form.minArea) p.set("minArea", form.minArea);
   if (form.maxArea) p.set("maxArea", form.maxArea);
   if (form.bedrooms) p.set("bedrooms", form.bedrooms);
@@ -258,10 +238,6 @@ function AmlakSearchInner() {
   const neighborhoods = meta?.neighborhoods ?? [];
   const fields = form.categoryId ? meta?.fields ?? [] : [];
 
-  const transactionType = form.transactionType as TransactionType | "";
-  const showPriceFields = !transactionType || !RENT_BASED_TRANSACTION_TYPES.includes(transactionType);
-  const showRentFields = !transactionType || RENT_BASED_TRANSACTION_TYPES.includes(transactionType);
-
   return (
     <div className="search-page">
       <PropertyAssistant />
@@ -318,47 +294,6 @@ function AmlakSearchInner() {
             ))}
           </select>
         </div>
-
-        {showPriceFields && (
-          <div className="form-group form-group--range">
-            <label>محدودهٔ قیمت (تومان)</label>
-            <div className="range-inputs">
-              <input type="number" min={0} placeholder="از" value={form.minPrice} onChange={(e) => updateForm({ minPrice: e.target.value })} />
-              <input type="number" min={0} placeholder="تا" value={form.maxPrice} onChange={(e) => updateForm({ maxPrice: e.target.value })} />
-            </div>
-          </div>
-        )}
-
-        {showRentFields && (
-          <>
-            <div className="form-group form-group--range">
-              <label>محدودهٔ رهن (تومان)</label>
-              <div className="range-inputs">
-                <input type="number" min={0} placeholder="از" value={form.minDeposit} onChange={(e) => updateForm({ minDeposit: e.target.value })} />
-                <input type="number" min={0} placeholder="تا" value={form.maxDeposit} onChange={(e) => updateForm({ maxDeposit: e.target.value })} />
-              </div>
-            </div>
-            <div className="form-group form-group--range">
-              <label>محدودهٔ اجارهٔ ماهانه (تومان)</label>
-              <div className="range-inputs">
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="از"
-                  value={form.minMonthlyRent}
-                  onChange={(e) => updateForm({ minMonthlyRent: e.target.value })}
-                />
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="تا"
-                  value={form.maxMonthlyRent}
-                  onChange={(e) => updateForm({ maxMonthlyRent: e.target.value })}
-                />
-              </div>
-            </div>
-          </>
-        )}
 
         <div className="form-group form-group--range">
           <label>متراژ (متر مربع)</label>
@@ -424,9 +359,9 @@ function AmlakSearchInner() {
         <div className="search-results__toolbar">
           <span>{loading ? "در حال جستجو…" : `${total.toLocaleString("fa-IR")} آگهی یافت شد`}</span>
           <select value={form.sort} onChange={(e) => updateForm({ sort: e.target.value as SearchSort })}>
-            {Object.entries(SORT_LABELS).map(([value, label]) => (
+            {PROPERTY_SORT_OPTIONS.map((value) => (
               <option key={value} value={value}>
-                {label}
+                {PROPERTY_SORT_LABELS[value]}
               </option>
             ))}
           </select>
