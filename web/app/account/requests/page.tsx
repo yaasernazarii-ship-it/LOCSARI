@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
 import { db } from "@/lib/db";
 import { REQUEST_TYPE_LABELS, REQUEST_STATUS_LABELS } from "@/lib/labels";
+import { formatJalaliDate } from "@/lib/jalali";
 import RequestStatusSelect from "@/components/RequestStatusSelect";
 
 // صندوق واحد درخواست‌های تماس/بازدید (فاز ۵.۱) — هم درخواست‌های دریافتی (روی آگهی‌های خودم)
@@ -71,7 +72,7 @@ export default async function RequestsInboxPage() {
                     <p className="my-ad-row__meta">
                       {REQUEST_TYPE_LABELS[r.type] ?? r.type}
                       {received ? ` · درخواست‌دهنده: ${r.name}` : ""}
-                      {r.preferred_date ? ` · تاریخ پیشنهادی: ${new Date(r.preferred_date).toLocaleDateString("fa-IR")}` : ""}
+                      {r.preferred_date ? ` · تاریخ پیشنهادی: ${formatJalaliDate(r.preferred_date)}` : ""}
                       {r.preferred_time ? ` ساعت ${r.preferred_time}` : ""}
                     </p>
                     {received && <RequestStatusSelect requestId={r.id} status={r.status} />}

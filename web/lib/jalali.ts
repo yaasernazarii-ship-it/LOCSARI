@@ -65,3 +65,13 @@ export function parseJalaliDateString(input: string): Date | null {
   const date = new Date(Date.UTC(gy, gm - 1, gd));
   return Number.isNaN(date.getTime()) ? null : date;
 }
+
+export function formatJalaliDate(input: string | Date): string {
+  const date = typeof input === "string" && /^\d{4}-\d{2}-\d{2}$/.test(input) ? new Date(`${input}T12:00:00Z`) : new Date(input);
+  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Tehran",
+  }).format(date);
+}

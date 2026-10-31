@@ -128,8 +128,15 @@ export default function ContactBox({
           {openType === "viewing_request" && (
             <div className="form-grid">
               <div className="form-group">
-                <label>تاریخ پیشنهادی بازدید *</label>
-                <input type="date" value={preferredDate} onChange={(e) => setPreferredDate(e.target.value)} required />
+                <label>تاریخ پیشنهادی بازدید (شمسی) *</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={preferredDate}
+                  onChange={(e) => setPreferredDate(e.target.value)}
+                  placeholder="۱۴۰۵/۰۸/۰۹"
+                  required
+                />
               </div>
               <div className="form-group">
                 <label>ساعت پیشنهادی</label>

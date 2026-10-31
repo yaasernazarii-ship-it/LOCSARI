@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/session";
 import { db } from "@/lib/db";
 import { parseId } from "@/lib/validation";
 import { REQUEST_TYPE_LABELS, REQUEST_STATUS_LABELS } from "@/lib/labels";
+import { formatJalaliDate } from "@/lib/jalali";
 import RequestStatusSelect from "@/components/RequestStatusSelect";
 
 // جزئیات کامل یک درخواست تماس/بازدید — فقط برای مالک آگهی یا خودِ درخواست‌دهنده قابل مشاهده (IDOR-safe: 404 برای بقیه).
@@ -63,7 +64,7 @@ export default async function RequestDetailPage({ params }: { params: { id: stri
           )}
           {row.preferred_date && (
             <p className="my-ad-row__meta">
-              تاریخ پیشنهادی: {new Date(row.preferred_date).toLocaleDateString("fa-IR")}
+              تاریخ پیشنهادی: {formatJalaliDate(row.preferred_date)}
               {row.preferred_time ? ` ساعت ${row.preferred_time}` : ""}
             </p>
           )}

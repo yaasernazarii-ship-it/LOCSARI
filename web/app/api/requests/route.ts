@@ -4,6 +4,7 @@ import { requireAuth } from "@/lib/apiAuth";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { logAdminAction } from "@/lib/audit";
 import { parseId, isValidRequestType, isValidTimeString } from "@/lib/validation";
+import { parseJalaliDateString } from "@/lib/jalali";
 
 // POST /api/requests — ثبت درخواست تماس/بازدید روی یک آگهی منتشرشده (فاز ۵.۱ «Contact & Viewing Request Inbox»)
 // همان Entity ساخته‌شده در فاز ۵ (advertisement_inquiries) را با owner_user_id/preferred_time/status کامل‌تر استفاده می‌کند؛
@@ -56,9 +57,9 @@ export async function POST(req: NextRequest) {
     if (typeof body.preferredDate !== "string" || !body.preferredDate) {
       return NextResponse.json({ error: "preferredDate برای درخواست بازدید الزامی است" }, { status: 400 });
     }
-    const d = new Date(body.preferredDate);
-    if (Number.isNaN(d.getTime())) return NextResponse.json({ error: "preferredDate نامعتبر است" }, { status: 400 });
-    preferredDate = body.preferredDate;
+    const date = parseJalaliDateString(body.preferredDate);
+    if (!date) return NextResponse.json({ error: "تاریخ پیشنهادی باید به‌صورت شمسی وارد شود" }, { status: 400 });
+    preferredDate = date.toISOString().slice(0, 10);
 
     if (body.preferredTime !== undefined && body.preferredTime !== null && body.preferredTime !== "") {
       if (!isValidTimeString(body.preferredTime)) return NextResponse.json({ error: "preferredTime نامعتبر است" }, { status: 400 });
