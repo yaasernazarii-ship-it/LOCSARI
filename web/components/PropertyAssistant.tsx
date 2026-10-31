@@ -91,6 +91,27 @@ export default function PropertyAssistant() {
     </div>}
     {message && <p className="form-hint">{message}</p>}
     {pushAlert && <button type="button" className="btn-secondary property-assistant__push" onClick={enablePush}>فعال‌سازی اعلان در این دستگاه</button>}
-    {results.length > 0 && <div className="property-assistant__results">{results.map((item) => <Link key={item.id} href={`/agahi/${item.slug}`}>{item.primary_image && <img src={item.primary_image} alt="" />}<span>{item.title}</span></Link>)}</div>}
+    {results.length > 0 && (
+      <section className="property-assistant__matches" aria-live="polite">
+        <div className="property-assistant__matches-heading">
+          <span>پیشنهادهای منتخب</span>
+          <h3>{results.length.toLocaleString("fa-IR")} ملک متناسب با نیاز شما یافت شد</h3>
+        </div>
+        <div className="property-assistant__results">
+          {results.map((item) => (
+            <Link key={item.id} href={`/agahi/${item.slug}`}>
+              <div className="property-assistant__result-image">
+                {item.primary_image ? <img src={item.primary_image} alt={item.title} /> : <div className="property-assistant__result-placeholder" />}
+                <span>مشاهده آگهی</span>
+              </div>
+              <div className="property-assistant__result-body">
+                <strong>{item.title}</strong>
+                <small>جزئیات کامل ملک و تصاویر را ببینید</small>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+    )}
   </section>;
 }
