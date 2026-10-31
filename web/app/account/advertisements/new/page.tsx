@@ -5,7 +5,8 @@ import PropertyAdForm from "@/components/PropertyAdForm";
 // صفحهٔ ثبت آگهی جدید (بخش «Advertisement Form» فاز ۵) — فقط برای کاربران واردشده.
 export default async function NewAdvertisementPage({ searchParams }: { searchParams: { cipPlan?: string } }) {
   const user = await getCurrentUser();
-  const cipPlanId = Number(searchParams.cipPlan);
+  const parsedCipPlanId = Number(searchParams.cipPlan);
+  const cipPlanId = Number.isInteger(parsedCipPlanId) && parsedCipPlanId > 0 ? parsedCipPlanId : undefined;
   if (!user) redirect(`/login?next=/account/advertisements/new${cipPlanId ? `?cipPlan=${cipPlanId}` : ""}`);
 
   return (
