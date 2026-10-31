@@ -136,6 +136,7 @@ interface BaseForm {
   bedrooms: string;
   builtYear: string;
   floor: string;
+  totalFloors: string;
   locationPrecision: string;
   latitude: number | null;
   longitude: number | null;
@@ -163,6 +164,7 @@ function emptyBaseForm(): BaseForm {
     bedrooms: "",
     builtYear: "",
     floor: "",
+    totalFloors: "",
     locationPrecision: "approximate",
     latitude: null,
     longitude: null,
@@ -373,6 +375,7 @@ export default function PropertyAdForm(props: Props) {
           bedrooms: p.bedrooms !== null ? String(p.bedrooms) : "",
           builtYear: p.built_year !== null ? String(Math.trunc(Number(p.built_year))) : "",
           floor: p.floor !== null ? String(p.floor) : "",
+          totalFloors: p.total_floors !== null ? String(p.total_floors) : "",
           locationPrecision: p.location_precision ?? "approximate",
           latitude: p.latitude ?? null,
           longitude: p.longitude ?? null,
@@ -509,6 +512,7 @@ export default function PropertyAdForm(props: Props) {
       bedrooms: numOrNull(base.bedrooms),
       builtYear: numOrNull(base.builtYear),
       floor: numOrNull(base.floor),
+      totalFloors: numOrNull(base.totalFloors),
       locationPrecision: base.locationPrecision,
       latitude: base.latitude,
       longitude: base.longitude,
@@ -924,6 +928,7 @@ export default function PropertyAdForm(props: Props) {
                     {Array.from({ length: 5 }, (_, index) => index + 1).map((bedrooms) => (
                       <option key={bedrooms} value={bedrooms}>{bedrooms.toLocaleString("fa-IR")}</option>
                     ))}
+                    <option value="6">بیش از ۵ اتاق خواب</option>
                   </select>
                 </div>
               )}
@@ -940,10 +945,22 @@ export default function PropertyAdForm(props: Props) {
                 </div>
               )}
               {baseFieldSettings.showFloor && (
-                <div className="form-group">
-                  <label>طبقه</label>
-                  <input type="number" min={-2} max={30} value={base.floor} onChange={(e) => updateBase({ floor: e.target.value })} />
-                </div>
+                <>
+                  <div className="form-group">
+                    <label>طبقه</label>
+                    <input type="number" min={-2} max={30} value={base.floor} onChange={(e) => updateBase({ floor: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>تعداد طبقات</label>
+                    <select value={base.totalFloors} onChange={(e) => updateBase({ totalFloors: e.target.value })}>
+                      <option value="">انتخاب کنید</option>
+                      {Array.from({ length: 10 }, (_, index) => index + 1).map((totalFloors) => (
+                        <option key={totalFloors} value={totalFloors}>{totalFloors.toLocaleString("fa-IR")}</option>
+                      ))}
+                      <option value="11">بیش از ۱۰ طبقه</option>
+                    </select>
+                  </div>
+                </>
               )}
             </>
           )}
