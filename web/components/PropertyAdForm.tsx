@@ -2,7 +2,7 @@
 
 // فرم ثبت/ویرایش ملک و آگهی (بخش «Advertisement Form» فاز ۵) — بر پایهٔ contract دقیق APIهای فاز ۳:
 // properties POST/PATCH، advertisements POST/PATCH، properties/:id/media، categories/:id/fields.
-// حالت create: ویزارد سه‌مرحله‌ای (ملک -> تصاویر -> آگهی). حالت edit: همهٔ بخش‌ها در یک صفحه.
+// حالت create: ثبت مشخصات ملک و آگهی و توضیحات، سپس تصاویر در مرحلهٔ پایانی. حالت edit: همهٔ بخش‌ها در یک صفحه.
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -1249,9 +1249,9 @@ export default function PropertyAdForm(props: Props) {
       {props.mode === "create" ? (
         <>
           {renderPropertySection()}
-          {renderMediaSection()}
           {renderAdInfoSection()}
           {renderDescriptionSection()}
+          {renderMediaSection()}
           <div className="form-actions">
             <button type="button" className="btn-primary" onClick={submitStep3} disabled={saving || uploading || adStatus === "pending_review"}>
               {saving ? "در حال ثبت…" : adStatus === "pending_review" ? "آگهی برای بررسی ارسال شد" : "ثبت و ارسال برای بررسی"}

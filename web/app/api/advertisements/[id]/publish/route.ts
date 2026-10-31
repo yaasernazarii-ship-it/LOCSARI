@@ -28,6 +28,27 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   const now = new Date();
   const expiresAt = new Date(now.getTime() + DEFAULT_LISTING_DURATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  const mediaCount = await db
+    .selectFrom("property_media")
+    .select((eb) => eb.fn.countAll<number>().as("count"))
+    .where("property_id", "=", ad.property_id)
+    .executeTakeFirstOrThrow();
+
+  if (Number(mediaCount.count) === 0) {
+    await db
+      .insertInto("property_media")
+      .values({
+        property_id: ad.property_id,
+        storage_key: "system/site-logo",
+        url: "/icon-512.png",
+        alt_text: "لوگوی لوکیشن ساری",
+        is_primary: true,
+        file_size: null,
+        mime_type: "image/png",
+        sort_order: 0,
+      })
+      .execute();
+  }
 
   await transitionAdvertisementStatus(db, {
     advertisementId: id,
