@@ -1926,14 +1926,16 @@ textarea {
 }
 
 .dashboard-topbar__user-meta {
-  display: none;
+  display: block;
+  min-width: 0;
 }
 
 .dashboard-topbar__user-meta strong {
   display: block;
   color: #222;
-  font-size: 0.84rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .dashboard-topbar__user-meta span {

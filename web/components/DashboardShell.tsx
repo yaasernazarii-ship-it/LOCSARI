@@ -58,12 +58,12 @@ export default function DashboardShell({
             <span className="dashboard-topbar__title">{topbarTitle}</span>
             <div className="dashboard-topbar__user">
               <Link href="/" className="dashboard-topbar__home-link">
-                بازگشت به سایت
+                صفحه اصلی
               </Link>
               <div className="dashboard-topbar__user-info">
                 <span className="dashboard-avatar">{initialsOf(userName)}</span>
                 <span className="dashboard-topbar__user-meta">
-                  <strong>{userName}</strong>
+                  <strong>حساب کاربری: {userName}</strong>
                   {userMeta && <span>{userMeta}</span>}
                 </span>
               </div>
