@@ -2033,11 +2033,13 @@ textarea {
   }
   .dashboard-sidebar {
     position: fixed;
-    inset-block: 60px 0;
-    inset-inline-start: 0;
-    width: 260px;
+    top: 60px;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: min(260px, 86vw);
     z-index: 36;
-    transform: translateX(100%);
+    transform: translateX(110%);
     transition: transform 0.2s ease;
     overflow-y: auto;
     box-shadow: -6px 0 24px rgba(0, 0, 0, 0.1);
