@@ -1,4 +1,4 @@
-const CACHE_NAME = "locationsari-v3";
+const CACHE_NAME = "locationsari-v4";
 const OFFLINE_URL = "/offline.html";
 const PRECACHE_ASSETS = [
   OFFLINE_URL,
