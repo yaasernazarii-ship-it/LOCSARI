@@ -414,6 +414,32 @@ export default function PropertyAdForm(props: Props) {
     setBase((b) => ({ ...b, ...patch }));
   }
 
+  // ویژگی‌های پرشدهٔ دسته‌بندی را با برچسب فارسی و متن گزینه (نه شناسه) می‌خوانیم تا دستیار
+  // توضیحات فقط بر پایهٔ داده‌های واقعی فرم بنویسد و چیزی از قلم نیفتد.
+  function attributeDetails(): { label: string; value: string }[] {
+    const result: { label: string; value: string }[] = [];
+    for (const f of fields.filter((field) => !isDuplicateBaseField(field))) {
+      const raw = attrs[f.id];
+      const isEmpty = raw === undefined || raw === "" || (Array.isArray(raw) && raw.length === 0);
+      if (isEmpty) continue;
+      const label = f.label_fa;
+      if (Array.isArray(raw)) {
+        const values = raw
+          .map((id) => f.options.find((o) => String(o.id) === id)?.label_fa)
+          .filter((v): v is string => Boolean(v));
+        if (values.length) result.push({ label, value: values.join("، ") });
+      } else if (f.field_type === "select") {
+        const option = f.options.find((o) => String(o.id) === raw)?.label_fa;
+        if (option) result.push({ label, value: option });
+      } else if (f.field_type === "boolean") {
+        result.push({ label, value: raw === "true" ? "دارد" : "ندارد" });
+      } else {
+        result.push({ label, value: String(raw) });
+      }
+    }
+    return result;
+  }
+
   async function generateDescription() {
     setError("");
     setSuggestedDescription("");
@@ -431,14 +457,19 @@ export default function PropertyAdForm(props: Props) {
           title: base.title,
           description: base.description,
           category: selectedCategory?.name ?? "",
+          subcategory: categories.find((c) => c.id === Number(base.subcategoryId))?.name ?? "",
           location: neighborhood?.name ?? "",
+          transactionType: TRANSACTION_TYPE_LABELS[adForm.transactionType as TransactionType] || "",
           area: base.area,
           builtArea: base.builtArea,
           bedrooms: base.bedrooms,
           builtYear: base.builtYear,
+          floor: base.floor,
+          totalFloors: base.totalFloors,
           price: adForm.price,
           deposit: adForm.deposit,
           monthlyRent: adForm.monthlyRent,
+          attributes: attributeDetails(),
         }),
       });
       const data = await response.json().catch(() => null);

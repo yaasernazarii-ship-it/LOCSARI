@@ -23,11 +23,15 @@ export async function POST(req: NextRequest) {
     title: text(body?.title),
     description: text(body?.description),
     category: text(body?.category),
+    subcategory: text(body?.subcategory),
     location: text(body?.location),
+    transactionType: text(body?.transactionType),
     area: text(body?.area),
     builtArea: text(body?.builtArea),
     bedrooms: text(body?.bedrooms),
     builtYear: text(body?.builtYear),
+    floor: text(body?.floor),
+    totalFloors: text(body?.totalFloors),
     price: text(body?.price),
     deposit: text(body?.deposit),
     monthlyRent: text(body?.monthlyRent),
@@ -35,6 +39,17 @@ export async function POST(req: NextRequest) {
   if (!details.title || !details.category) {
     return NextResponse.json({ error: "برای تولید توضیحات، عنوان و دسته‌بندی را وارد کنید" }, { status: 400 });
   }
+
+  const attributes = Array.isArray(body?.attributes)
+    ? body.attributes
+        .filter((item: unknown) => item && typeof item === "object")
+        .map((item: { label?: unknown; value?: unknown }) => ({
+          label: text(item.label),
+          value: text(item.value),
+        }))
+        .filter((item: { label: string; value: string }) => item.label && item.value)
+        .slice(0, 40)
+    : [];
 
   let response: Response;
   try {
@@ -52,7 +67,12 @@ export async function POST(req: NextRequest) {
             role: "system",
             content: "You are an expert Persian real-estate copywriter. Rewrite the provided description into an engaging, polished advertisement. Preserve every factual claim from the original description and the supplied fields; do not omit meaningful details. Begin with an appealing opening, highlight the listing's provided strengths naturally, and end with a short invitation to contact for details. Never invent amenities, prices, addresses, availability, guarantees, or contact information. Avoid generic filler, emojis, headings, and bullet points. If the original description is empty, write from the supplied fields only. Return only 3 to 5 fluent Persian sentences.",
           },
-          { role: "user", content: `اطلاعات آگهی:\n${JSON.stringify(details)}` },
+          {
+            role: "user",
+            content: `اطلاعات آگهی:\n${JSON.stringify(details)}\n\nویژگی‌های تکمیل‌شدهٔ ملک:\n${
+              attributes.length ? attributes.map((a: { label: string; value: string }) => `- ${a.label}: ${a.value}`).join("\n") : "—"
+            }`,
+          },
         ],
       }),
     });
