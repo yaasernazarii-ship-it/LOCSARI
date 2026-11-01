@@ -40,6 +40,7 @@ body {
   background: #f6f7f9;
   color: #1a1a1a;
   direction: rtl;
+  overflow-x: hidden;
 }
 
 a {
@@ -2063,7 +2064,47 @@ textarea {
   }
 }
 
-.kpi-grid {
+@media (max-width: 600px) {
+  .dashboard-topbar {
+    padding: 0 12px;
+    gap: 10px;
+  }
+
+  .dashboard-topbar__title {
+    font-size: 0.86rem;
+    white-space: nowrap;
+  }
+
+  .dashboard-topbar__user {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .dashboard-topbar__home-link,
+  .dashboard-logout {
+    font-size: 0.72rem;
+  }
+
+  .dashboard-topbar__user-info {
+    min-width: 0;
+    padding-inline-start: 8px;
+  }
+
+  .dashboard-topbar__user-meta {
+    max-width: 118px;
+    overflow: hidden;
+  }
+
+  .dashboard-topbar__user-meta strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dashboard-content {
+    padding-inline: 12px;
+  }
+}
+
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 14px;
