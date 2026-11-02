@@ -171,6 +171,8 @@ export interface CipRequestsTable {
   video_url: string | null;
   assigned_consultant_id: number | null;
   assigned_at: ColumnType<Date | null, string | null | undefined, string | null | undefined>;
+  contract_accepted_at: ColumnType<Date | null, string | null | undefined, string | null | undefined>;
+  contract_accepted_phone: string | null;
   created_at: ColumnType<Date, string | undefined, never>;
   updated_at: ColumnType<Date, string | undefined, string | undefined>;
 }

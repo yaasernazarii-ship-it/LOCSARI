@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const purpose = body?.purpose as OtpPurpose;
 
   if (!isValidIranianPhone(phone)) return NextResponse.json({ error: "شماره موبایل معتبر نیست" }, { status: 400 });
-  if (purpose !== "registration" && purpose !== "password_reset" && purpose !== "login")
+  if (purpose !== "registration" && purpose !== "password_reset" && purpose !== "login" && purpose !== "cip_contract")
     return NextResponse.json({ error: "purpose نامعتبر است" }, { status: 400 });
   if (purpose === "login" && OTP_LOGIN_DISABLED)
     return NextResponse.json({ error: "ورود با کد پیامکی موقتاً غیرفعال است" }, { status: 503 });

@@ -42,7 +42,7 @@ export function isValidIranianPhone(phone: string): boolean {
 // بعد از تأیید موفق OTP، به‌جای نگه‌داشتن وضعیت «تأیید شده» در دیتابیس، یک توکن کوتاه‌عمر
 // امضاشده صادر می‌شود که فقط برای همان شماره و همان purpose معتبر است. این توکن جایگزین ارسال
 // مجدد کد در مرحلهٔ نهایی (تکمیل ثبت‌نام / تعیین رمز جدید) می‌شود.
-export type OtpPurpose = "registration" | "password_reset" | "login";
+export type OtpPurpose = "registration" | "password_reset" | "login" | "cip_contract";
 const OTP_TICKET_TTL = "10m";
 const OTP_TICKET_TYPE = "otp_ticket";
 

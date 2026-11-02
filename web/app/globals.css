@@ -3493,3 +3493,149 @@ a.contact-info-card:hover {
 @media (max-width: 680px) {
   .cip-portrait-video { width: min(100%, 41.625vh, 360px); height: min(74vh, 640px); }
 }
+
+/* ---------- قرارداد CIP و تأیید با کد پیامک پیش از پرداخت ---------- */
+
+.cip-contract {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid #dbe3f4;
+  border-radius: 14px;
+  background: #f7f9fd;
+}
+
+.cip-contract--confirmed {
+  border-color: #a7f3d0;
+  background: #f0fdf4;
+}
+
+.cip-contract__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  color: #0a1f44;
+}
+
+.cip-contract__panel {
+  margin-top: 10px;
+}
+
+.cip-contract__text {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 0.88rem;
+  line-height: 2;
+  color: #33415c;
+}
+
+.cip-contract__text p {
+  margin: 0 0 10px;
+  white-space: pre-line;
+}
+
+.cip-contract__text p:last-child {
+  margin-bottom: 0;
+}
+
+.cip-contract__read {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.cip-contract__read input {
+  width: auto;
+}
+
+.cip-contract__otp-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.cip-contract__otp-row input {
+  flex: 1;
+  min-width: 140px;
+  max-width: 200px;
+  padding: 11px 12px;
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  letter-spacing: 0.35em;
+  text-align: center;
+  background: #fff;
+}
+
+.cip-contract__otp-row .btn-primary {
+  width: auto;
+  padding: 11px 22px;
+}
+
+.cip-contract__resend,
+.cip-contract__cancel {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  font: inherit;
+  font-size: 0.82rem;
+  color: #0145c9;
+  cursor: pointer;
+}
+
+.cip-contract__cancel {
+  color: #6b7280;
+}
+
+.cip-contract__resend:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cip-contract-details {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  padding: 16px 18px;
+}
+
+.cip-contract-details summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #0145c9;
+}
+
+.cip-contract-details .cip-contract__text {
+  margin-top: 12px;
+  border: none;
+  padding: 0;
+}
+
+@media (max-width: 600px) {
+  .cip-contract {
+    padding: 14px;
+  }
+
+  .cip-contract__text {
+    max-height: 220px;
+    padding: 12px;
+    font-size: 0.84rem;
+  }
+
+  .cip-contract__otp-row input,
+  .cip-contract__otp-row .btn-primary {
+    width: 100%;
+    max-width: none;
+    flex: 1 1 100%;
+  }
+}

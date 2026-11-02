@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/apiAuth";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { createZibalPayment } from "@/lib/zibal";
+import { verifyCipContractTicket } from "@/lib/cipContract";
 import { parseId } from "@/lib/validation";
 
 const PAYMENT_HOSTS = new Set(["locationsari.ir", "www.locationsari.ir", "locationsari.com", "www.locationsari.com"]);
@@ -22,6 +23,9 @@ export async function POST(req: NextRequest) {
   const planId = parseId(String(body?.planId ?? ""));
   const advertisementId = parseId(String(body?.advertisementId ?? ""));
   if (!planId || !advertisementId) return NextResponse.json({ error: "پلن یا آگهی نامعتبر است" }, { status: 400 });
+  if (!(await verifyCipContractTicket(body?.contractTicket, auth.user.id))) {
+    return NextResponse.json({ error: "برای پرداخت، ابتدا قرارداد را بخوانید و شمارهٔ خود را با کد پیامک تأیید کنید" }, { status: 403 });
+  }
   const [plan, advertisement] = await Promise.all([
     db.selectFrom("cip_plans").selectAll().where("id", "=", planId).where("is_active", "=", true).executeTakeFirst(),
     db.selectFrom("advertisements").select("id").where("id", "=", advertisementId).where("created_by_user_id", "=", auth.user.id).executeTakeFirst(),
@@ -55,7 +59,18 @@ export async function POST(req: NextRequest) {
         .execute();
       return { redirectUrl: renewedPayment.redirectUrl };
     }
-    const cipRequest = await tx.insertInto("cip_requests").values({ user_id: auth.user.id, advertisement_id: advertisement.id, plan_id: plan.id, price: Number(plan.price) }).returningAll().executeTakeFirstOrThrow();
+    const cipRequest = await tx
+      .insertInto("cip_requests")
+      .values({
+        user_id: auth.user.id,
+        advertisement_id: advertisement.id,
+        plan_id: plan.id,
+        price: Number(plan.price),
+        contract_accepted_at: new Date().toISOString(),
+        contract_accepted_phone: auth.user.phone,
+      })
+      .returningAll()
+      .executeTakeFirstOrThrow();
     const payment = await createZibalPayment(Number(plan.price) * 10, `${paymentOrigin(req)}/api/payments/zibal/callback`, `سفارش ویدیوی CIP: ${plan.title}`);
     await tx.insertInto("cip_payment_orders").values({ cip_request_id: cipRequest.id, user_id: auth.user.id, gateway: "zibal", authority: payment.authority, amount_rial: Number(plan.price) * 10 }).execute();
     return { redirectUrl: payment.redirectUrl };

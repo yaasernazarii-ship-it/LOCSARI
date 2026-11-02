@@ -105,6 +105,24 @@ export default async function CipPage() {
           {plans.length === 0 && <p className="search-empty">در حال حاضر پلن فعالی برای CIP وجود ندارد.</p>}
         </div>
       </section>
+
+      {content["cip.contract_text"].trim() && (
+        <section className="home-section cip-contract-preview">
+          <div className="home-section__heading">
+            <span className="cip-eyebrow">BEFORE YOU PAY</span>
+            <h2>{content["cip.contract_title"]}</h2>
+            <p>پیش از پرداخت، متن قرارداد را بهدقت بخوانید. تأیید نهایی با کد پیامک در مرحلهٔ سفارش انجام می‌شود.</p>
+          </div>
+          <details className="cip-contract-details">
+            <summary>مشاهدهٔ متن کامل قرارداد</summary>
+            <div className="cip-contract__text">
+              {content["cip.contract_text"].split(/\r?\n/).map((line, index) => (
+                <p key={index}>{line}</p>
+              ))}
+            </div>
+          </details>
+        </section>
+      )}
     </>
   );
 }
