@@ -23,11 +23,11 @@ interface SmsIrVerifyResponse {
 }
 
 /** کد OTP را از طریق قالب (Pattern) تأییدشدهٔ SMS.ir ارسال می‌کند. در صورت خطا SmsSendError پرتاب می‌شود. */
-export async function sendOtpSms(phone: string, code: string): Promise<void> {
+export async function sendOtpSms(phone: string, code: string, templateIdOverride?: number): Promise<void> {
   const apiKey = process.env.SMSIR_API_KEY;
   if (!apiKey) throw new SmsSendError("SMSIR_API_KEY تنظیم نشده است");
 
-  const templateId = Number(process.env.SMSIR_OTP_TEMPLATE_ID || DEFAULT_TEMPLATE_ID);
+  const templateId = templateIdOverride ?? Number(process.env.SMSIR_OTP_TEMPLATE_ID || DEFAULT_TEMPLATE_ID);
   const paramName = process.env.SMSIR_OTP_PARAM_NAME || DEFAULT_PARAM_NAME;
 
   let res: Response;
