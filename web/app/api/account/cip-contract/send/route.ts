@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/apiAuth";
 import { createOtpChallenge } from "@/lib/otp";
 import { sendCipContractOtpSms, isSmsConfigured } from "@/lib/sms";
-import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { checkPersistentRateLimit, getClientIp } from "@/lib/rateLimit";
 
 // POST /api/account/cip-contract/send — ارسال کد تأیید قرارداد CIP به شمارهٔ ثبت‌شدهٔ همان کاربر.
 // شماره از نشست گرفته می‌شود، نه از ورودی، تا کد به شمارهٔ دیگری ارسال نشود.
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   if (!isSmsConfigured()) {
     return NextResponse.json({ error: "سرویس پیامک در حال حاضر پیکربندی نشده است" }, { status: 503 });
   }
-  if (!checkRateLimit(`cip-contract-send:user:${auth.user.id}`, 5, 15 * 60_000) || !checkRateLimit(`cip-contract-send-ip:${getClientIp(req)}`, 20, 15 * 60_000)) {
+  if (!(await checkPersistentRateLimit(`cip-contract-send:user:${auth.user.id}`, 5, 15 * 60_000)) || !(await checkPersistentRateLimit(`cip-contract-send-ip:${getClientIp(req)}`, 20, 15 * 60_000))) {
     return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است. کمی بعد تلاش کنید" }, { status: 429 });
   }
 

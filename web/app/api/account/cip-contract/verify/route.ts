@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/apiAuth";
 import { verifyOtpChallenge } from "@/lib/otp";
 import { signCipContractTicket } from "@/lib/cipContract";
-import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { checkPersistentRateLimit, getClientIp } from "@/lib/rateLimit";
 
 // POST /api/account/cip-contract/verify — بررسی کد پیامک قرارداد و صدور بلیت کوتاه‌عمر برای پرداخت.
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if (auth.response) return auth.response;
-  if (!checkRateLimit(`cip-contract-verify:user:${auth.user.id}`, 10, 10 * 60_000) || !checkRateLimit(`cip-contract-verify-ip:${getClientIp(req)}`, 30, 10 * 60_000)) {
+  if (!(await checkPersistentRateLimit(`cip-contract-verify:user:${auth.user.id}`, 10, 10 * 60_000)) || !(await checkPersistentRateLimit(`cip-contract-verify-ip:${getClientIp(req)}`, 30, 10 * 60_000))) {
     return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است" }, { status: 429 });
   }
   const body = await req.json().catch(() => null);

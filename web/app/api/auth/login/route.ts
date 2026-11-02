@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifyPassword, signSessionToken, isValidIranianPhone } from "@/lib/auth";
-import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { checkPersistentRateLimit, getClientIp } from "@/lib/rateLimit";
 import { COOKIE_NAME } from "@/lib/session";
 
 export async function POST(req: NextRequest) {
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   if (!isValidIranianPhone(phone) || !password) {
     return NextResponse.json({ error: "شماره موبایل یا رمز عبور اشتباه است" }, { status: 401 });
   }
-  if (!checkRateLimit(`login:phone:${phone}`, 5, 15 * 60_000) || !checkRateLimit(`login:ip:${getClientIp(req)}`, 30, 15 * 60_000)) {
+  if (!(await checkPersistentRateLimit(`login:phone:${phone}`, 5, 15 * 60_000)) || !(await checkPersistentRateLimit(`login:ip:${getClientIp(req)}`, 30, 15 * 60_000))) {
     return NextResponse.json({ error: "تعداد تلاش برای ورود بیش از حد مجاز است. کمی بعد تلاش کنید" }, { status: 429 });
   }
 

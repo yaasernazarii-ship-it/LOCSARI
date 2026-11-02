@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidIranianPhone, signOtpTicket, type OtpPurpose } from "@/lib/auth";
 import { verifyOtpChallenge } from "@/lib/otp";
-import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { checkPersistentRateLimit, getClientIp } from "@/lib/rateLimit";
 
 // POST /api/auth/otp/verify — بررسی کد OTP و صدور ticket کوتاه‌عمر برای مرحلهٔ نهایی (فاز ۱.۲)
 export async function POST(req: NextRequest) {
@@ -17,9 +17,9 @@ export async function POST(req: NextRequest) {
 
   const ip = getClientIp(req);
   // محدودیت نرخ بررسی کد: حداکثر ۱۰ بار در ۱۰ دقیقه برای هر شماره+purpose، و حداکثر ۳۰ بار در ساعت برای هر IP
-  if (!checkRateLimit(`otp-verify:phone:${phone}:${purpose}`, 10, 10 * 60_000))
+  if (!(await checkPersistentRateLimit(`otp-verify:phone:${phone}:${purpose}`, 10, 10 * 60_000)))
     return NextResponse.json({ error: "تعداد تلاش بیش از حد مجاز است" }, { status: 429 });
-  if (!checkRateLimit(`otp-verify:ip:${ip}`, 30, 60 * 60_000))
+  if (!(await checkPersistentRateLimit(`otp-verify:ip:${ip}`, 30, 60 * 60_000)))
     return NextResponse.json({ error: "تعداد تلاش بیش از حد مجاز است" }, { status: 429 });
 
   const result = await verifyOtpChallenge(phone, purpose, code);

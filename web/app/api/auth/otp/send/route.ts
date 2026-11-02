@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { isValidIranianPhone, type OtpPurpose } from "@/lib/auth";
 import { createOtpChallenge } from "@/lib/otp";
 import { sendOtpSms, isSmsConfigured } from "@/lib/sms";
-import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { checkPersistentRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const OTP_LOGIN_DISABLED = false;
 
@@ -21,9 +21,9 @@ export async function POST(req: NextRequest) {
 
   const ip = getClientIp(req);
   // محدودیت نرخ ارسال: حداکثر ۳ بار در ۱۰ دقیقه برای هر شماره+purpose، و حداکثر ۱۰ بار در ساعت برای هر IP
-  if (!checkRateLimit(`otp-send:phone:${phone}:${purpose}`, 3, 10 * 60_000))
+  if (!(await checkPersistentRateLimit(`otp-send:phone:${phone}:${purpose}`, 3, 10 * 60_000)))
     return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است. کمی بعد تلاش کنید" }, { status: 429 });
-  if (!checkRateLimit(`otp-send:ip:${ip}`, 10, 60 * 60_000))
+  if (!(await checkPersistentRateLimit(`otp-send:ip:${ip}`, 10, 60 * 60_000)))
     return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است. کمی بعد تلاش کنید" }, { status: 429 });
 
   const existing = await db.selectFrom("users").select("id").where("phone", "=", phone).executeTakeFirst();
