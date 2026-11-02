@@ -23,6 +23,8 @@ export const SITE_CONTENT_DEFAULTS = {
   "cip.empty_message": "هنوز ویدیوی CIP منتشرشده‌ای وجود ندارد.",
   "cip.plans_title": "پلن‌های تولید ویدیوی CIP",
   "cip.plans_description": "برای ملک خود ویدیوی حرفه‌ای سفارش دهید. پس از پرداخت، تیم ما برای هماهنگی تصویربرداری با شما تماس می‌گیرد.",
+  "cip.contract_title": "قرارداد تولید ویدیوی CIP",
+  "cip.contract_text": "",
 } as const;
 
 export type SiteContentKey = keyof typeof SITE_CONTENT_DEFAULTS;
