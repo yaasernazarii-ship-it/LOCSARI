@@ -22,13 +22,13 @@ interface SmsIrVerifyResponse {
   data?: { messageId?: number; cost?: number };
 }
 
-/** کد OTP را از طریق قالب (Pattern) تأییدشدهٔ SMS.ir ارسال می‌کند. در صورت خطا SmsSendError پرتاب می‌شود. */
-export async function sendOtpSms(phone: string, code: string, templateIdOverride?: number): Promise<void> {
+async function sendVerifySms(
+  phone: string,
+  templateId: number,
+  parameters: { name: string; value: string }[]
+): Promise<void> {
   const apiKey = process.env.SMSIR_API_KEY;
   if (!apiKey) throw new SmsSendError("SMSIR_API_KEY تنظیم نشده است");
-
-  const templateId = templateIdOverride ?? Number(process.env.SMSIR_OTP_TEMPLATE_ID || DEFAULT_TEMPLATE_ID);
-  const paramName = process.env.SMSIR_OTP_PARAM_NAME || DEFAULT_PARAM_NAME;
 
   let res: Response;
   try {
@@ -39,11 +39,7 @@ export async function sendOtpSms(phone: string, code: string, templateIdOverride
         Accept: "text/plain",
         "x-api-key": apiKey,
       },
-      body: JSON.stringify({
-        mobile: phone,
-        templateId,
-        parameters: [{ name: paramName, value: code }],
-      }),
+      body: JSON.stringify({ mobile: phone, templateId, parameters }),
     });
   } catch {
     throw new SmsSendError("اتصال به سرویس پیامک برقرار نشد");
@@ -53,4 +49,18 @@ export async function sendOtpSms(phone: string, code: string, templateIdOverride
   if (!res.ok || !data || data.status !== 1) {
     throw new SmsSendError(data?.message || `خطای ارسال پیامک (HTTP ${res.status})`);
   }
+}
+
+/** کد OTP را از طریق قالب (Pattern) تأییدشدهٔ SMS.ir ارسال می‌کند. در صورت خطا SmsSendError پرتاب می‌شود. */
+export async function sendOtpSms(phone: string, code: string, templateIdOverride?: number): Promise<void> {
+  const templateId = templateIdOverride ?? Number(process.env.SMSIR_OTP_TEMPLATE_ID || DEFAULT_TEMPLATE_ID);
+  const paramName = process.env.SMSIR_OTP_PARAM_NAME || DEFAULT_PARAM_NAME;
+  await sendVerifySms(phone, templateId, [{ name: paramName, value: code }]);
+}
+
+export async function sendCipContractOtpSms(phone: string, fullName: string, code: string): Promise<void> {
+  await sendVerifySms(phone, 930574, [
+    { name: "FULLNAME", value: fullName },
+    { name: "CODE", value: code },
+  ]);
 }
