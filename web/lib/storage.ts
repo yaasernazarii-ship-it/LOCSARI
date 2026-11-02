@@ -31,8 +31,18 @@ export interface StorageService {
 const UPLOAD_ROOT = resolve(process.env.UPLOAD_DIR || join(process.cwd(), "public", "uploads"));
 const PUBLIC_PREFIX = "/uploads"; // URL عمومی — مستقل از مسیر فایل‌سیستم؛ توسط Route Handler/Nginx روی همین prefix سرو می‌شود
 
+function hasExpectedFileSignature(buffer: Buffer, extension: string): boolean {
+  if (extension === "jpg") return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+  if (extension === "png") return buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+  if (extension === "webp") return buffer.length >= 12 && buffer.subarray(0, 4).toString() === "RIFF" && buffer.subarray(8, 12).toString() === "WEBP";
+  if (extension === "webm") return buffer.length >= 4 && buffer.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3]));
+  if (extension === "mp4" || extension === "mov") return buffer.length >= 12 && buffer.subarray(4, 8).toString() === "ftyp";
+  return false;
+}
+
 class LocalStorageService implements StorageService {
   async save(buffer: Buffer, opts: { subDir: string; extension: string }): Promise<SavedFile> {
+    if (!hasExpectedFileSignature(buffer, opts.extension)) throw new Error("Invalid uploaded file signature");
     const dir = join(UPLOAD_ROOT, opts.subDir);
     await mkdir(dir, { recursive: true });
     const filename = `${randomUUID()}.${opts.extension}`;

@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "dev-secret-change-me");
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) throw new Error("JWT_SECRET must be configured");
+const JWT_SECRET = new TextEncoder().encode(jwtSecret);
 const TOKEN_TTL = "12h"; // عمر کوتاه؛ چون Authorization هر بار از دیتابیس تازه‌سازی می‌شود، نیازی به عمر طولانی توکن نیست
 
 export async function hashPassword(password: string): Promise<string> {

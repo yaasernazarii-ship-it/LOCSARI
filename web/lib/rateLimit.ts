@@ -5,9 +5,9 @@ import { NextRequest } from "next/server";
 const buckets = new Map<string, { count: number; resetAt: number }>();
 
 export function getClientIp(req: NextRequest): string {
-  const forwarded = req.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
-  return "unknown";
+  const realIp = req.headers.get("x-real-ip")?.trim();
+  if (!realIp || !/^[0-9a-f:.]+$/i.test(realIp)) return "unknown";
+  return realIp;
 }
 
 /** true یعنی مجاز، false یعنی از سقف رد شده */
