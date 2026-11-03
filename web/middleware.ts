@@ -20,7 +20,9 @@ export function middleware(req: NextRequest) {
     const allowedOrigins = new Set([
       forwardedOrigin,
       "https://locationsari.ir",
+      "https://www.locationsari.ir",
       "https://locationsari.com",
+      "https://www.locationsari.com",
     ]);
     if (!allowedOrigins.has(originUrl.origin)) {
       return NextResponse.json({ error: "درخواست از مبدأ نامعتبر است" }, { status: 403 });
