@@ -7,12 +7,7 @@ import { logAdminAction } from "@/lib/audit";
 import { parseId } from "@/lib/validation";
 import { getActiveVipSubscription } from "@/lib/vip";
 import { createZibalPayment } from "@/lib/zibal";
-
-const PAYMENT_HOSTS = new Set(["locationsari.ir", "www.locationsari.ir", "locationsari.com", "www.locationsari.com"]);
-
-function paymentOrigin(req: NextRequest): string {
-  return PAYMENT_HOSTS.has(req.nextUrl.hostname) ? `https://${req.nextUrl.hostname}` : "https://locationsari.ir";
-}
+import { requestOrigin } from "@/lib/requestOrigin";
 
 // GET /api/account/vip-subscriptions — تاریخچهٔ اشتراک‌های VIP کاربر جاری + اشتراک فعال (در صورت وجود)
 export async function GET() {
@@ -94,7 +89,7 @@ export async function POST(req: NextRequest) {
       if (!payment) return null;
       const renewedPayment = await createZibalPayment(
         Number(payment.amount_rial),
-        `${paymentOrigin(req)}/api/payments/zibal/callback`,
+        `${requestOrigin(req)}/api/payments/zibal/callback`,
         `خرید اشتراک VIP: ${plan.title}`
       );
       await tx
@@ -120,7 +115,7 @@ export async function POST(req: NextRequest) {
 
     const payment = await createZibalPayment(
       Number(created.price) * 10,
-      `${paymentOrigin(req)}/api/payments/zibal/callback`,
+      `${requestOrigin(req)}/api/payments/zibal/callback`,
       `خرید اشتراک VIP: ${plan.title}`
     );
 

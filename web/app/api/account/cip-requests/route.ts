@@ -6,12 +6,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { createZibalPayment } from "@/lib/zibal";
 import { verifyCipContractTicket } from "@/lib/cipContract";
 import { parseId } from "@/lib/validation";
-
-const PAYMENT_HOSTS = new Set(["locationsari.ir", "www.locationsari.ir", "locationsari.com", "www.locationsari.com"]);
-
-function paymentOrigin(req: NextRequest): string {
-  return PAYMENT_HOSTS.has(req.nextUrl.hostname) ? `https://${req.nextUrl.hostname}` : "https://locationsari.ir";
-}
+import { requestOrigin } from "@/lib/requestOrigin";
 
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
@@ -49,7 +44,7 @@ export async function POST(req: NextRequest) {
       if (!payment) return null;
       const renewedPayment = await createZibalPayment(
         Number(payment.amount_rial),
-        `${paymentOrigin(req)}/api/payments/zibal/callback`,
+        `${requestOrigin(req)}/api/payments/zibal/callback`,
         `سفارش ویدیوی CIP: ${plan.title}`
       );
       await tx
@@ -71,7 +66,7 @@ export async function POST(req: NextRequest) {
       })
       .returningAll()
       .executeTakeFirstOrThrow();
-    const payment = await createZibalPayment(Number(plan.price) * 10, `${paymentOrigin(req)}/api/payments/zibal/callback`, `سفارش ویدیوی CIP: ${plan.title}`);
+    const payment = await createZibalPayment(Number(plan.price) * 10, `${requestOrigin(req)}/api/payments/zibal/callback`, `سفارش ویدیوی CIP: ${plan.title}`);
     await tx.insertInto("cip_payment_orders").values({ cip_request_id: cipRequest.id, user_id: auth.user.id, gateway: "zibal", authority: payment.authority, amount_rial: Number(plan.price) * 10 }).execute();
     return { redirectUrl: payment.redirectUrl };
   });

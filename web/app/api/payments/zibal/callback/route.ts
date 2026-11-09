@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifyZibalPayment } from "@/lib/zibal";
-
-const PAYMENT_HOSTS = new Set(["locationsari.ir", "www.locationsari.ir", "locationsari.com", "www.locationsari.com"]);
+import { requestHostname, requestOrigin } from "@/lib/requestOrigin";
 
 function resultUrl(req: NextRequest, status: "success" | "failed", message: string) {
-  const origin = PAYMENT_HOSTS.has(req.nextUrl.hostname) ? `https://${req.nextUrl.hostname}` : "https://locationsari.ir";
-  return new URL(`/account/vip?payment=${status}&message=${encodeURIComponent(message)}`, origin);
+  return new URL(`/account/vip?payment=${status}&message=${encodeURIComponent(message)}`, requestOrigin(req));
 }
 
 export async function GET(req: NextRequest) {
@@ -22,11 +20,10 @@ export async function GET(req: NextRequest) {
     .where("authority", "=", authority)
     .executeTakeFirst();
   if (cipOrder) {
-    const origin = PAYMENT_HOSTS.has(req.nextUrl.hostname) ? `https://${req.nextUrl.hostname}` : "https://locationsari.com";
-    const cipUrl = (status: "success" | "failed", message: string) => new URL(`/account/cip?payment=${status}&message=${encodeURIComponent(message)}`, origin);
+    const cipUrl = (status: "success" | "failed", message: string) => new URL(`/account/cip?payment=${status}&message=${encodeURIComponent(message)}`, requestOrigin(req));
     if (cipOrder.status === "paid") return NextResponse.redirect(cipUrl("success", "پرداخت قبلاً تأیید شده است"));
     try {
-      const verification = await verifyZibalPayment(authority, Number(cipOrder.amount_rial), req.nextUrl.hostname);
+      const verification = await verifyZibalPayment(authority, Number(cipOrder.amount_rial), requestHostname(req));
       if (!verification.success) {
         await db.transaction().execute(async (tx) => {
           await tx.updateTable("cip_payment_orders").set({ status: "failed", error_code: String(verification.result.result), verify_payload: verification.result, updated_at: new Date().toISOString() }).where("id", "=", cipOrder.id).execute();
@@ -62,7 +59,7 @@ export async function GET(req: NextRequest) {
   if (order.status === "paid") return NextResponse.redirect(resultUrl(req,"success", "پرداخت قبلاً تأیید شده است"));
 
   try {
-    const verification = await verifyZibalPayment(authority, Number(order.amount_rial), req.nextUrl.hostname);
+    const verification = await verifyZibalPayment(authority, Number(order.amount_rial), requestHostname(req));
     const callbackPayload = Object.fromEntries(req.nextUrl.searchParams.entries());
 
     if (!verification.success) {
