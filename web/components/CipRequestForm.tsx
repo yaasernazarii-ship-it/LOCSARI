@@ -21,7 +21,9 @@ export default function CipRequestForm({
   contractText: string;
 }) {
   const [planId, setPlanId] = useState(String(selectedPlanId ?? plans[0]?.id ?? ""));
-  const [advertisementId, setAdvertisementId] = useState(String(selectedAdvertisementId ?? ""));
+  const [advertisementId, setAdvertisementId] = useState(
+    String(selectedAdvertisementId ?? (advertisements.length === 1 ? advertisements[0].id : ""))
+  );
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -203,6 +205,9 @@ export default function CipRequestForm({
       </div>
 
       <small>پس از پرداخت، تیم مدیریت برای هماهنگی تصویربرداری با شما تماس می‌گیرد.</small>
+      {contractTicket && !advertisementId && (
+        <p className="my-ad__error">برای پرداخت، ابتدا آگهی ملک را انتخاب کنید.</p>
+      )}
       <button className="btn-primary" disabled={submitting || !advertisementId || !contractTicket} type="submit">
         {submitting ? "در حال انتقال به پرداخت..." : contractTicket ? "پرداخت و ثبت درخواست" : "ابتدا قرارداد را تأیید کنید"}
       </button>
