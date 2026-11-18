@@ -211,7 +211,7 @@ const BOOLEAN_FEATURES: { key: string; pattern: RegExp }[] = [
   { key: "bargh", pattern: /برق/ },
   { key: "gaz", pattern: /گاز/ },
   { key: "divarkeshi", pattern: /دیوارکشی|دیوار کشی/ },
-  { key: "bar_khiaban", pattern: /بر خیابان|برخیابان/ },
+  { key: "bar_khiaban", pattern: /بر خیابان|برخیابان|بر زمین/ },
 ];
 
 const DEAL_SLUG_PREFIX: Record<string, string> = {
