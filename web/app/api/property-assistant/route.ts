@@ -2,7 +2,8 @@ import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { normalizePhone, parsePropertyQuery, searchPropertyQuery } from "@/lib/propertyAlerts";
-import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { parseAssistantQuery, searchAssistant, type AssistantIntent, type AssistantResult } from "@/lib/propertyAssistantQuery";
+import { checkPersistentRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const DEFAULT_ASSISTANT_NAME = "دستیار نیازسنجی هوشمند شما";
 
@@ -11,13 +12,39 @@ export async function GET() {
   return NextResponse.json({ name: settings?.name ?? DEFAULT_ASSISTANT_NAME });
 }
 
+type EngineResult = { intent: AssistantIntent; results: AssistantResult[]; relaxed: boolean };
+
+/**
+ * موتور جدید نیازسنجی. هر خطایی (در پارس یا جست‌وجو) اینجا گرفته و null برگردانده می‌شود
+ * تا مسیر اصلی با موتور قبلی ادامه دهد؛ یعنی رفتار فعلی سایت هرگز بدتر نمی‌شود.
+ */
+async function runAssistantEngine(queryText: string): Promise<EngineResult | null> {
+  try {
+    const intent = await parseAssistantQuery(queryText);
+    const { items, relaxed } = await searchAssistant(intent);
+    return { intent, results: items, relaxed };
+  } catch (error) {
+    console.error("assistant engine failed, falling back to legacy parser", error);
+    return null;
+  }
+}
+
 export async function POST(req: NextRequest) {
-  if (!checkRateLimit(`property-assistant:${getClientIp(req)}`, 20, 10 * 60_000)) return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است" }, { status: 429 });
+  if (!(await checkPersistentRateLimit(`property-assistant:${getClientIp(req)}`, 20, 10 * 60_000)))
+    return NextResponse.json({ error: "تعداد درخواست بیش از حد مجاز است" }, { status: 429 });
   const body = await req.json().catch(() => null) as { query?: unknown; phone?: unknown; name?: unknown; subscribe?: unknown } | null;
   const queryText = typeof body?.query === "string" ? body.query.trim().slice(0, 500) : "";
   if (!queryText) return NextResponse.json({ error: "درخواست ملک را بنویسید" }, { status: 400 });
+
+  const engine = await runAssistantEngine(queryText);
+
+  // مسیر قبلی: پایهٔ ثبت هشدار (property_alerts) و مبنای بازگشت در صورت خطای موتور جدید.
   const parsed = await parsePropertyQuery(queryText);
-  const results = await searchPropertyQuery(parsed);
+  const results = engine ? engine.results : await searchPropertyQuery(parsed);
+  const understood = engine
+    ? { summary: engine.intent.summary, relaxed: engine.relaxed, engine: "structured" as const }
+    : { summary: "", relaxed: false, engine: "legacy" as const };
+
   const wantsAlert = body?.subscribe === true || results.length === 0;
   let alertCreated = false;
   let alert: { id: number; pushToken: string } | null = null;
@@ -35,5 +62,5 @@ export async function POST(req: NextRequest) {
     alert = { id: createdAlert.id, pushToken: createdAlert.push_token };
     alertCreated = true;
   }
-  return NextResponse.json({ parsed, results, needsPhone: wantsAlert && !alertCreated, alertCreated, alert });
+  return NextResponse.json({ parsed, results, needsPhone: wantsAlert && !alertCreated, alertCreated, alert, understood });
 }

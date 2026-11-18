@@ -34,6 +34,7 @@ export default function PropertyAssistant() {
   const [pushAlert, setPushAlert] = useState<PushAlert | null>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [understood, setUnderstood] = useState<{ summary: string; relaxed: boolean; engine: string } | null>(null);
 
   useEffect(() => {
     fetch("/api/property-assistant")
@@ -56,6 +57,7 @@ export default function PropertyAssistant() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "جست‌وجو انجام نشد");
       setResults(data.results ?? []);
+      setUnderstood(data.understood && typeof data.understood.summary === "string" && data.understood.summary ? data.understood : null);
       setNeedsPhone(Boolean(data.needsPhone));
       setPushAlert(data.alert?.id && data.alert?.pushToken ? data.alert : null);
       if (data.alertCreated) setMessage("درخواست شما ثبت شد؛ آگهی‌های جدید را پیامک می‌کنیم.");
@@ -105,6 +107,11 @@ export default function PropertyAssistant() {
       {needsPhone && <div className="property-assistant__form"><input value={name} onChange={(event) => setName(event.target.value)} placeholder="نام و نام خانوادگی" /><input value={phone} inputMode="tel" onChange={(event) => setPhone(event.target.value)} placeholder="شماره موبایل" /><button type="button" className="btn-secondary" disabled={loading} onClick={() => submit(true)}>ثبت اطلاع‌رسانی</button></div>}
     </div>}
     {message && <p className="form-hint">{message}</p>}
+    {understood && <div className="property-assistant__understood">
+      <span>برداشت ما از درخواست شما</span>
+      <p>{understood.summary}</p>
+      {understood.relaxed && <small>برای پیدا کردن نتیجه، محدودهٔ جستجو کمی بازتر شد.</small>}
+    </div>}
     {pushAlert && <button type="button" className="btn-secondary property-assistant__push" onClick={enablePush}>فعال‌سازی اعلان در این دستگاه</button>}
     {results.length > 0 && (
       <section className="property-assistant__matches" aria-live="polite">
