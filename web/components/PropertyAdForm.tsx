@@ -944,13 +944,6 @@ export default function PropertyAdForm(props: Props) {
                 <input type="number" min={0} value={base.area} onChange={(e) => updateBase({ area: e.target.value })} />
                 {measurementInWords(base.area) && <small className="number-in-words">{measurementInWords(base.area)} متر مربع</small>}
               </div>
-              {baseFieldSettings.showBuiltArea && (
-                <div className="form-group">
-                  <label>زیربنا (متر مربع)</label>
-                  <input type="number" min={0} value={base.builtArea} onChange={(e) => updateBase({ builtArea: e.target.value })} />
-                  {measurementInWords(base.builtArea) && <small className="number-in-words">{measurementInWords(base.builtArea)} متر مربع</small>}
-                </div>
-              )}
               {baseFieldSettings.showBedrooms && (
                 <div className="form-group">
                   <label>تعداد اتاق خواب</label>
