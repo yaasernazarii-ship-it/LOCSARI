@@ -5,6 +5,15 @@ import Link from "next/link";
 
 const DEFAULT_ASSISTANT_NAME = "دستیار نیازسنجی هوشمند شما";
 
+function PlusIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 8v8M8 12h8" />
+    </svg>
+  );
+}
+
 type Result = { id: number; slug: string; title: string; primary_image: string | null };
 type PushAlert = { id: number; pushToken: string };
 
@@ -84,6 +93,12 @@ export default function PropertyAssistant() {
     <div className="property-assistant__form">
       <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="مثلاً آپارتمان ۲ خوابه حوالی طالقانی تا ۴ میلیارد برای خرید" />
       <button type="button" className="btn-primary" disabled={loading} onClick={() => submit()}> {loading ? "در حال جست‌وجو…" : "جست‌وجو"} </button>
+    </div>
+    <div className="property-assistant__submit-ad">
+      <span>ملکی برای فروش، رهن یا اجاره دارید؟</span>
+      <Link href="/account/advertisements/new">
+        <PlusIcon /> ثبت آگهی
+      </Link>
     </div>
     {(needsPhone || results.length > 0) && <div className="property-assistant__alert">
       <label><input type="checkbox" checked={needsPhone} onChange={(event) => setNeedsPhone(event.target.checked)} /> آگهی‌های جدید این منطقه را به من پیامک کن</label>
